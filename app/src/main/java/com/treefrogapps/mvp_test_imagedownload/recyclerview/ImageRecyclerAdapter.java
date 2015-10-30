@@ -7,11 +7,11 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-public class ImageRecyclerView extends RecyclerView.Adapter<ImageRecyclerView.MYViewHolder> {
+public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdapter.MYViewHolder> {
 
     private ArrayList<RecyclerBitmap> mRecyclerBitmaps;
 
-    public ImageRecyclerView(ArrayList<RecyclerBitmap> recyclerBitmaps){
+    public ImageRecyclerAdapter(ArrayList<RecyclerBitmap> recyclerBitmaps){
 
         this.mRecyclerBitmaps = recyclerBitmaps;
     }

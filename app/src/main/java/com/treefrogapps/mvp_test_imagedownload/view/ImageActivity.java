@@ -15,7 +15,11 @@ import android.widget.Toast;
 import com.treefrogapps.mvp_test_imagedownload.MVP;
 import com.treefrogapps.mvp_test_imagedownload.R;
 import com.treefrogapps.mvp_test_imagedownload.presenter.ImagePresenter;
+import com.treefrogapps.mvp_test_imagedownload.recyclerview.ImageRecyclerAdapter;
+import com.treefrogapps.mvp_test_imagedownload.recyclerview.RecyclerBitmap;
 import com.treefrogapps.mvp_test_imagedownload.utils.ViewContext;
+
+import java.util.ArrayList;
 
 
 public class ImageActivity extends AppCompatActivity implements MVP.ViewInterface, View.OnClickListener {
@@ -24,6 +28,8 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     private EditText urlEditText;
     private Button goButton;
     private RecyclerView recyclerView;
+    private ArrayList<RecyclerBitmap> recyclerBitmaps;
+    private ImageRecyclerAdapter imageRecyclerAdapter;
 
     private ImagePresenter mImagePresenter;
     private ViewContext mViewContext;
@@ -48,12 +54,18 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     }
 
     private void initialiseUI() {
+
         urlEditText = (EditText) findViewById(R.id.urlEditText);
         goButton = (Button) findViewById(R.id.goButton);
         goButton.setOnClickListener(this);
+
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(),
                 2,GridLayoutManager.HORIZONTAL, false));
+        recyclerBitmaps = new ArrayList<>();
+        imageRecyclerAdapter = new ImageRecyclerAdapter(recyclerBitmaps);
+        recyclerView.setAdapter(imageRecyclerAdapter);
+
     }
 
 
