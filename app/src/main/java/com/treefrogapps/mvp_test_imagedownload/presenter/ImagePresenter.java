@@ -1,32 +1,29 @@
 package com.treefrogapps.mvp_test_imagedownload.presenter;
 
 
-import android.graphics.Bitmap;
-
 import com.treefrogapps.mvp_test_imagedownload.MVP;
+import com.treefrogapps.mvp_test_imagedownload.model.ImageModel;
+import com.treefrogapps.mvp_test_imagedownload.utils.ViewContext;
 
 import java.lang.ref.WeakReference;
 
 public class ImagePresenter implements MVP.PresenterInterface {
 
     private WeakReference<MVP.ViewInterface> viewInterface;
+    private ImageModel mImageModel;
 
     public ImagePresenter(MVP.ViewInterface viewInterface){
 
         this.viewInterface = new WeakReference<>(viewInterface);
-
-
+        this.mImageModel = new ImageModel();
     }
 
 
 
     @Override
-    public void displayImage(Bitmap bitmap) {
+    public void handleButtonClick(ViewContext viewContext, String url) {
 
-    }
-
-    @Override
-    public void handleButtonClick(String url) {
+        mImageModel.downloadBitmap(viewContext, url);
 
     }
 
