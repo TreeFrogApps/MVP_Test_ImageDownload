@@ -31,14 +31,11 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:scaleType="centerInside"
-        android:adjustViewBounds="true"
-        android:layout_margin="16dp"
-        android:background="@color/grey"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_margin="4dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
 
 </LinearLayout>

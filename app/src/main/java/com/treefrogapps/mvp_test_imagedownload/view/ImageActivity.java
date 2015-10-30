@@ -3,12 +3,13 @@ package com.treefrogapps.mvp_test_imagedownload.view;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.treefrogapps.mvp_test_imagedownload.MVP;
@@ -22,7 +23,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     private Toolbar mToolbar;
     private EditText urlEditText;
     private Button goButton;
-    private ImageView imageView;
+    private RecyclerView recyclerView;
 
     private ImagePresenter mImagePresenter;
     private ViewContext mViewContext;
@@ -39,16 +40,20 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
             mToolbar.showOverflowMenu();
         }
 
-        urlEditText = (EditText) findViewById(R.id.urlEditText);
-        goButton = (Button) findViewById(R.id.goButton);
-        goButton.setOnClickListener(this);
-        imageView = (ImageView) findViewById(R.id.imageView);
-
-
+        initialiseUI();
 
         //first time in - or config change
         if (mImagePresenter == null) mImagePresenter = new ImagePresenter(this);
 
+    }
+
+    private void initialiseUI() {
+        urlEditText = (EditText) findViewById(R.id.urlEditText);
+        goButton = (Button) findViewById(R.id.goButton);
+        goButton.setOnClickListener(this);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(),
+                2,GridLayoutManager.HORIZONTAL, false));
     }
 
 
@@ -68,7 +73,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     @Override
     public void displayImage(Bitmap bitmap) {
 
-        imageView.setImageBitmap(bitmap);
+
 
     }
 
