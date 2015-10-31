@@ -29,6 +29,12 @@ public interface MVP {
 
     interface ModelInterface {
 
-        void downloadBitmap(ViewContext viewContext, String url);
+        void downloadBitmap(ViewContext viewContext, DownloadFinishedObserver downloadFinishedObserver,  String url);
+    }
+
+    interface DownloadFinishedObserver {
+
+        void downloadedImage(Bitmap bitmap);
+
     }
 }
