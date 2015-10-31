@@ -15,7 +15,9 @@ public class RetainedFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         setRetainInstance(true);
+
     }
+
 
 
     public void putObject(String key, Object object){

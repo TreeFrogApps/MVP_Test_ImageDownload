@@ -2,7 +2,10 @@ package com.treefrogapps.mvp_test_imagedownload;
 
 import android.graphics.Bitmap;
 
+import com.treefrogapps.mvp_test_imagedownload.recyclerview.RecyclerBitmap;
 import com.treefrogapps.mvp_test_imagedownload.utils.ViewContext;
+
+import java.util.ArrayList;
 
 /**
  * Create interfaces for MVP pattern
@@ -17,6 +20,8 @@ public interface MVP {
     interface PresenterInterface {
 
         void handleButtonClick(ViewContext viewContext, String url);
+        void onCreate();
+        ArrayList<RecyclerBitmap> recyclerBitmaps();
         boolean downloadSuccess();
     }
 

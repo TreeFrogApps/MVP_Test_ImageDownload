@@ -16,6 +16,7 @@ public class RecyclerBitmap {
         this.mFilename = filename;
     }
 
+
     public Bitmap getBitmap() {
         return mBitmap;
     }
