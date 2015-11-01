@@ -4,5 +4,6 @@
     <string name="edit_text_enter_url_hint">http://climate.nasa.gov/system/feature_items/images/9_images_of_change.jpg</string>
     <string name="button_go">go</string>
     <string name="add_button">Add</string>
+    <string name="downloaded_image">Downloaded Image</string>
 
 </resources>

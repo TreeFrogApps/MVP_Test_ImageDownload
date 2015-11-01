@@ -2,6 +2,7 @@ package com.treefrogapps.mvp_test_imagedownload.presenter;
 
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Log;
 
@@ -46,6 +47,16 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.DownloadFinis
         if (!mFileFolder.exists()){
             mFileFolder.mkdirs();
             Log.i("Folder", "Created");
+        }
+
+        if (mRecyclerBitmaps.size() == 0){
+
+            File[] fileArray = mFileFolder.listFiles();
+            if(fileArray.length > 0) {
+                for (File file : fileArray) {
+                    mRecyclerBitmaps.add(new RecyclerBitmap(BitmapFactory.decodeFile(file.getAbsolutePath())));
+                }
+            }
         }
     }
 

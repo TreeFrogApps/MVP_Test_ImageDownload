@@ -1,7 +1,18 @@
 package com.treefrogapps.mvp_test_imagedownload.utils;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.Environment;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Class to check downloaded bitmap file type and decode bitmap
@@ -62,7 +73,58 @@ public class ImageUtils {
             // not a valid image format
             return false;
         }
+    }
 
+    public static Bitmap scaleFilteredBitmap(InputStream inputStream){
+
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+
+        int scaleFactor = 12;
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
+
+        Bitmap scaledBitmap = BitmapFactory.decodeStream(inputStream, null, bmOptions);
+
+        Bitmap scaledFilteredBitmap = scaledBitmap.copy(scaledBitmap.getConfig(), true);
+
+        int width = scaledFilteredBitmap.getWidth();
+        int height = scaledFilteredBitmap.getHeight();
+
+        for (int i = 0; i < width; i++){
+
+            for (int j = 0; j < height; j++){
+
+                int p = scaledFilteredBitmap.getPixel(i,j);
+                int r = Color.red(p);
+                int g = Color.green(p);
+                int b = Color.blue(p);
+                int a = Color.alpha(p);
+
+                r-=50;
+                g-=50;
+                b+=100;
+                a=0;
+
+                scaledFilteredBitmap.setPixel(i,j, Color.argb(a, r, g, b));
+            }
+        }
+
+        String folderLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh_mm_ss", Locale.getDefault());
+        String filename = sdf.format(new Date());
+
+        File imageFile = new File(folderLocation + filename + ".jpg");
+
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
+            scaledFilteredBitmap.compress(Bitmap.CompressFormat.JPEG,100, fileOutputStream);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+        return scaledFilteredBitmap;
     }
 
 
