@@ -10,19 +10,13 @@ public class RecyclerBitmap {
     private String mFilename;
     private Uri mFileLocation;
 
-    public RecyclerBitmap(Bitmap bitmap, String filename){
+    public RecyclerBitmap(Bitmap bitmap){
 
         this.mBitmap = bitmap;
-        this.mFilename = filename;
-    }
 
+    }
 
     public Bitmap getBitmap() {
         return mBitmap;
     }
-
-    public String getFilename() {
-        return mFilename;
-    }
-
 }

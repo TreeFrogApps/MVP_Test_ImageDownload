@@ -6,6 +6,7 @@ import com.treefrogapps.mvp_test_imagedownload.recyclerview.RecyclerBitmap;
 import com.treefrogapps.mvp_test_imagedownload.utils.ViewContext;
 
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Create interfaces for MVP pattern
@@ -18,28 +19,26 @@ import java.util.ArrayList;
 public interface MVP {
 
     interface PresenterInterface {
-
-        void handleButtonClick(ViewContext viewContext, String url);
+        void handleButtonClick(String url);
+        void handleDownloads(ViewContext viewContext);
         void onCreate();
         ArrayList<RecyclerBitmap> recyclerBitmaps();
         boolean downloadSuccess();
     }
 
     interface ViewInterface {
-
         void showToast(String toastMessage);
         void displayImage(Bitmap bitmap);
         void updateRecyclerView();
     }
 
     interface ModelInterface {
+        void downloadBitmaps(ViewContext viewContext, DownloadFinishedObserver downloadFinishedObserver,
+                             ArrayList<String> urls, CountDownLatch countDownLatch);
 
-        void downloadBitmap(ViewContext viewContext, DownloadFinishedObserver downloadFinishedObserver,  String url);
     }
 
     interface DownloadFinishedObserver {
-
         void downloadedImage(Bitmap bitmap);
-
     }
 }

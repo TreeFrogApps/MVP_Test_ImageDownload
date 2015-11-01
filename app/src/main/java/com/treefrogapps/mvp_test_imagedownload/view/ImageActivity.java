@@ -31,6 +31,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     private Toolbar mToolbar;
     private EditText urlEditText;
     private Button goButton;
+    private Button addButton;
 
     private RecyclerView recyclerView;
     private ArrayList<RecyclerBitmap> recyclerBitmaps;
@@ -64,11 +65,15 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         if (mImagePresenter == null) mImagePresenter = new ImagePresenter(this);
         if (mViewContext == null) mViewContext = new ViewContext(this);
 
+        mImagePresenter.onCreate();
+
     }
 
     private void initialiseUI() {
 
         urlEditText = (EditText) findViewById(R.id.urlEditText);
+        addButton = (Button) findViewById(R.id.addButton);
+        addButton.setOnClickListener(this);
         goButton = (Button) findViewById(R.id.goButton);
         goButton.setOnClickListener(this);
 
@@ -98,25 +103,29 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     @Override
     public void displayImage(Bitmap bitmap) {
 
-
-
     }
 
     @Override
     public void updateRecyclerView() {
+
+        recyclerBitmaps = mImagePresenter.recyclerBitmaps();
+        imageRecyclerAdapter.notifyDataSetChanged();
 
     }
 
     @Override
     public void onClick(View v) {
 
-        switch (v.getId()){
+        switch (v.getId()) {
 
-            case R.id.goButton :
+            case R.id.goButton:
+                mImagePresenter.handleDownloads(mViewContext);
+
+            case R.id.addButton :
                 String url = urlEditText.getText().toString();
 
                 if (!url.equals("")) {
-                    mImagePresenter.handleButtonClick(mViewContext, url);
+                    mImagePresenter.handleButtonClick(url);
                 }
         }
     }
