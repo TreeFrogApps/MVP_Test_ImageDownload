@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -48,25 +49,30 @@ public class ImageUtils {
 
         if (headerValues[0] == 0xFF && headerValues[1] == 0xD8 && headerValues[2] == 0xFF){
             // image is a jpg (can be various types of jpg - denoted from 4th byte
+            Log.i("Image Type Valid", "jpg");
             return true;
 
         } else if (headerValues[0] == 0x89 && headerValues[1] == 0x50 && headerValues[2] == 0x4E && headerValues[3] == 0x47
                 && headerValues[4] == 0x0D && headerValues[5] == 0x0A && headerValues[6] == 0x1A && headerValues[7] == 0xA0){
             // image is a PNG file
+            Log.i("Image Type Valid", "png");
             return true;
 
         } else if (headerValues[0] == 0x47 && headerValues[1] == 0x49 && headerValues[2] == 0x46 && headerValues[3] == 0x38){
             // images is a GIF file
+            Log.i("Image Type Valid", "gif");
             return true;
 
         } else if ((headerValues[0] == 0x49 || headerValues[0] == 0x4D) &&
                 (headerValues[1] == 0x49 || headerValues[1] == 0x20 || headerValues[0] == 0x4D) &&
                 (headerValues[2] == 0x49 || headerValues[2] == 0x2A || headerValues[2] == 0x00)){
             // 99% sure this will be a TIF file
+            Log.i("Image Type Valid", "tif");
             return true;
 
         } else if (headerValues[0] == 0x42 && headerValues[1] == 0x4D) {
             // images is a BMP file
+            Log.i("Image Type Valid", "bmp");
             return true;
 
         } else {
@@ -79,7 +85,7 @@ public class ImageUtils {
 
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
 
-        int scaleFactor = 12;
+        int scaleFactor = 3;
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
         bmOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
@@ -101,20 +107,20 @@ public class ImageUtils {
                 int b = Color.blue(p);
                 int a = Color.alpha(p);
 
-                r-=50;
-                g-=50;
+                r =0;
+                g =0;
                 b+=100;
-                a=0;
+
 
                 scaledFilteredBitmap.setPixel(i,j, Color.argb(a, r, g, b));
             }
         }
 
-        String folderLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/";
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh_mm_ss", Locale.getDefault());
+        String folderLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/Assignment_Images";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh_mm_ss_SSS", Locale.getDefault());
         String filename = sdf.format(new Date());
 
-        File imageFile = new File(folderLocation + filename + ".jpg");
+        File imageFile = new File(folderLocation, "Image_downloaded_" + filename + ".jpg");
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
@@ -122,7 +128,6 @@ public class ImageUtils {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
 
         return scaledFilteredBitmap;
     }

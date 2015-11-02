@@ -56,16 +56,14 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
             fragmentManager.beginTransaction().add(mRetainedFragment, RetainedFragment.REATAINED_FRAGMENT_TAG).commit();
         }
 
-
-
         // handle config change by getting the instance of the presenter
         mImagePresenter = (ImagePresenter) mRetainedFragment.getObject(ImagePresenter.PRESENTER_KEY);
         mViewContext = (ViewContext) mRetainedFragment.getObject(ViewContext.VIEW_CONTEXT_KEY);
         //if null first time in
-        if (mImagePresenter == null) mImagePresenter = new ImagePresenter(this);
+        if (mImagePresenter == null) mImagePresenter = new ImagePresenter();
         if (mViewContext == null) mViewContext = new ViewContext(this);
 
-        mImagePresenter.onCreate();
+        mImagePresenter.onCreate(this);
         initialiseUI();
 
     }
@@ -109,8 +107,14 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     @Override
     public void updateRecyclerView() {
 
-        recyclerBitmaps = mImagePresenter.recyclerBitmaps();
-        imageRecyclerAdapter.notifyDataSetChanged();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                recyclerBitmaps = mImagePresenter.recyclerBitmaps();
+                imageRecyclerAdapter.notifyDataSetChanged();
+            }
+        });
+
 
     }
 

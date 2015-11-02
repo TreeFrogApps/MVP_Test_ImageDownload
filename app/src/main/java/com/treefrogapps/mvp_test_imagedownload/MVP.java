@@ -21,7 +21,7 @@ public interface MVP {
     interface PresenterInterface {
         void handleButtonClick(String url);
         void handleDownloads(ViewContext viewContext);
-        void onCreate();
+        void onCreate(MVP.ViewInterface viewInterface);
         ArrayList<RecyclerBitmap> recyclerBitmaps();
         boolean downloadSuccess();
     }

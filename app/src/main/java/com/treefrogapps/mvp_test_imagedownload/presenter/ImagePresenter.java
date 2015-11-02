@@ -29,18 +29,19 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.DownloadFinis
     private ArrayList<RecyclerBitmap> mRecyclerBitmaps;
     private CountDownLatch mCountDownLatch;
 
-    public ImagePresenter(MVP.ViewInterface viewInterface){
+    public ImagePresenter(){
 
-        this.mViewInterface = new WeakReference<>(viewInterface);
         this.mImageModel = new ImageModel();
         this.mDownloadFinishedObserver = this;
         this.mImagesToDownload = new ArrayList<>();
         this.mRecyclerBitmaps = new ArrayList<>();
-
     }
 
     @Override
-    public void onCreate() {
+    public void onCreate(MVP.ViewInterface viewInterface) {
+
+        // link / relink the viewInterface
+        this.mViewInterface = new WeakReference<>(viewInterface);
 
         mFolderLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/Assignment_Images";
         mFileFolder = new File(mFolderLocation);
@@ -75,7 +76,6 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.DownloadFinis
     public void handleDownloads(ViewContext viewContext) {
 
         mCountDownLatch = new CountDownLatch(mImagesToDownload.size());
-        mImageModel.downloadBitmaps(viewContext, this, mImagesToDownload, mCountDownLatch);
 
         new Thread(new Runnable() {
             @Override
@@ -85,10 +85,13 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.DownloadFinis
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
-                    mViewInterface.get().updateRecyclerView();
+                   if (mViewInterface != null) mViewInterface.get().updateRecyclerView();
                 }
             }
         }).start();
+
+        mImageModel.downloadBitmaps(viewContext, this, mImagesToDownload, mCountDownLatch);
+
     }
 
 

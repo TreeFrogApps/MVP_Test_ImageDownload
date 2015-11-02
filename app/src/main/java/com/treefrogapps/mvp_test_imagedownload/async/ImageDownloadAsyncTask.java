@@ -43,25 +43,23 @@ public class ImageDownloadAsyncTask extends AsyncTask<String, Void, Bitmap> {
         try {
             URL imageUrl = new URL(url);
             httpURLConnection = (HttpURLConnection) imageUrl.openConnection();
-
             if (httpURLConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 return null;
             }
-
             InputStream inputStream = httpURLConnection.getInputStream();
 
-            if (inputStream != null) {
-
                 if (ImageUtils.isValidImage(inputStream)) {
+                    httpURLConnection = (HttpURLConnection) imageUrl.openConnection();
+                    InputStream inputStream1 = httpURLConnection.getInputStream();
+                    bitmap = ImageUtils.scaleFilteredBitmap(inputStream1);
 
                     inputStream.close();
-
-                    bitmap = ImageUtils.scaleFilteredBitmap(inputStream);
+                    inputStream1.close();
 
                 } else {
                     return null;
                 }
-            }
+
 
 
         } catch (MalformedURLException e) {
