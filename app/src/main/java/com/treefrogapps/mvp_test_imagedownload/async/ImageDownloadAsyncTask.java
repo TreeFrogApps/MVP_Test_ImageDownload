@@ -2,6 +2,7 @@ package com.treefrogapps.mvp_test_imagedownload.async;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.treefrogapps.mvp_test_imagedownload.MVP;
 import com.treefrogapps.mvp_test_imagedownload.utils.ImageUtils;
@@ -24,16 +25,20 @@ public class ImageDownloadAsyncTask extends AsyncTask<String, Void, Bitmap> {
     private WeakReference<MVP.ViewInterface> viewContext;
     private WeakReference<MVP.DownloadFinishedObserver> downloadFinishedObserver;
     private CountDownLatch mCountDownLatch;
+    private int mIndex;
 
-    public ImageDownloadAsyncTask(ViewContext viewContext, MVP.DownloadFinishedObserver downloadFinishedObserver,
+    public ImageDownloadAsyncTask(int index, ViewContext viewContext, MVP.DownloadFinishedObserver downloadFinishedObserver,
                                   CountDownLatch countDownLatch) {
         this.viewContext = viewContext.getmView();
         this.downloadFinishedObserver = new WeakReference<>(downloadFinishedObserver);
         this.mCountDownLatch = countDownLatch;
+        this.mIndex = index;
     }
 
     @Override
     protected Bitmap doInBackground(String... params) {
+
+        Log.i("AsyncTask", String.valueOf(mIndex) + " doInBackground started");
 
         this.url = params[0];
 
@@ -48,18 +53,17 @@ public class ImageDownloadAsyncTask extends AsyncTask<String, Void, Bitmap> {
             }
             InputStream inputStream = httpURLConnection.getInputStream();
 
-                if (ImageUtils.isValidImage(inputStream)) {
-                    httpURLConnection = (HttpURLConnection) imageUrl.openConnection();
-                    InputStream inputStream1 = httpURLConnection.getInputStream();
-                    bitmap = ImageUtils.scaleFilteredBitmap(inputStream1);
+            if (ImageUtils.isValidImage(inputStream)) {
+                httpURLConnection = (HttpURLConnection) imageUrl.openConnection();
+                InputStream inputStream1 = httpURLConnection.getInputStream();
+                bitmap = ImageUtils.scaleFilteredBitmap(inputStream1);
 
-                    inputStream.close();
-                    inputStream1.close();
+                inputStream.close();
+                inputStream1.close();
 
-                } else {
-                    return null;
-                }
-
+            } else {
+                return null;
+            }
 
 
         } catch (MalformedURLException e) {
@@ -91,7 +95,8 @@ public class ImageDownloadAsyncTask extends AsyncTask<String, Void, Bitmap> {
     protected void onCancelled() {
         super.onCancelled();
 
-        viewContext.get().showToast("Download cancelled");
+        if (viewContext.get() != null)
+            viewContext.get().showToast("Download " + String.valueOf(mIndex) + " cancelled");
         mCountDownLatch.countDown();
     }
 }

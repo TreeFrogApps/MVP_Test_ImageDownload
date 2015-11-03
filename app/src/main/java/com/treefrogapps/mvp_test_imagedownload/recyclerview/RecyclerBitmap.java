@@ -10,7 +10,7 @@ public class RecyclerBitmap {
     private String mFilename;
     private Uri mFileLocation;
 
-    public RecyclerBitmap(Bitmap bitmap){
+    public RecyclerBitmap(Bitmap bitmap) {
 
         this.mBitmap = bitmap;
 

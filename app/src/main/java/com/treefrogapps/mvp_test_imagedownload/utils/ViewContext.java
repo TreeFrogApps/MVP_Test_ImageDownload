@@ -6,7 +6,6 @@ import java.lang.ref.WeakReference;
 
 /**
  * Create a context to the view layer - used to update to UI
- *
  */
 
 

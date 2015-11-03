@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.treefrogapps.mvp_test_imagedownload.MVP;
+import com.treefrogapps.mvp_test_imagedownload.async.ImageDownloadAsyncTask;
 import com.treefrogapps.mvp_test_imagedownload.model.ImageModel;
 import com.treefrogapps.mvp_test_imagedownload.recyclerview.RecyclerBitmap;
 import com.treefrogapps.mvp_test_imagedownload.utils.ViewContext;
@@ -28,8 +29,10 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.DownloadFinis
     private ArrayList<String> mImagesToDownload;
     private ArrayList<RecyclerBitmap> mRecyclerBitmaps;
     private CountDownLatch mCountDownLatch;
+    private Thread mThread;
+    private int mDownloadCount = 0;
 
-    public ImagePresenter(){
+    public ImagePresenter() {
 
         this.mImageModel = new ImageModel();
         this.mDownloadFinishedObserver = this;
@@ -45,17 +48,19 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.DownloadFinis
 
         mFolderLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/Assignment_Images";
         mFileFolder = new File(mFolderLocation);
-        if (!mFileFolder.exists()){
+        if (!mFileFolder.exists()) {
             mFileFolder.mkdirs();
             Log.i("Folder", "Created");
         }
 
-        if (mRecyclerBitmaps.size() == 0){
+        if (mRecyclerBitmaps.size() == 0) {
 
             File[] fileArray = mFileFolder.listFiles();
-            if(fileArray.length > 0) {
-                for (File file : fileArray) {
-                    mRecyclerBitmaps.add(new RecyclerBitmap(BitmapFactory.decodeFile(file.getAbsolutePath())));
+            if(fileArray != null) {
+                if (fileArray.length > 0) {
+                    for (File file : fileArray) {
+                        mRecyclerBitmaps.add(new RecyclerBitmap(BitmapFactory.decodeFile(file.getAbsolutePath())));
+                    }
                 }
             }
         }
@@ -66,10 +71,24 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.DownloadFinis
         return mRecyclerBitmaps;
     }
 
-
     @Override
     public void handleButtonClick(String url) {
         mImagesToDownload.add(url);
+        mDownloadCount++;
+        mViewInterface.get().updateDownloadCount();
+    }
+
+    @Override
+    public void deleteImages() {
+
+        // TODO
+
+        mViewInterface.get().updateRecyclerView();
+    }
+
+    @Override
+    public int getDownloadCount() {
+        return mDownloadCount;
     }
 
     @Override
@@ -77,39 +96,58 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.DownloadFinis
 
         mCountDownLatch = new CountDownLatch(mImagesToDownload.size());
 
-        new Thread(new Runnable() {
+        mThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     mCountDownLatch.await();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Log.d("AsyncTask Interrupt", "Shutting down AsyncTasks");
+                    shutdownAsyncTasks();
                 } finally {
-                   if (mViewInterface != null) mViewInterface.get().updateRecyclerView();
+                    mDownloadCount = 0;
+                    mImagesToDownload.clear();
+                    if (mViewInterface.get() != null) {
+                        mViewInterface.get().updateRecyclerView();
+                        mViewInterface.get().updateDownloadCount();
+                    }
                 }
             }
-        }).start();
+        });
 
+        mThread.start();
         mImageModel.downloadBitmaps(viewContext, this, mImagesToDownload, mCountDownLatch);
-
     }
-
-
-    @Override
-    public boolean downloadSuccess() {
-        return false;
-        // TODO
-    }
-
-
 
     @Override
     public void downloadedImage(Bitmap bitmap) {
 
-        synchronized (this){
+        synchronized (this) {
             RecyclerBitmap recyclerBitmap = new RecyclerBitmap(bitmap);
             mRecyclerBitmaps.add(recyclerBitmap);
         }
 
     }
+
+    @Override
+    public void shutdownAsyncTasks() {
+
+        // get current ImageAsyncTasks
+        ArrayList<ImageDownloadAsyncTask> imageDownloadAsyncTasks = mImageModel.getImageAsyncTasks();
+
+        synchronized (this) {
+            // set each to cancel
+            for (ImageDownloadAsyncTask task : imageDownloadAsyncTasks) {
+                task.cancel(true);
+            }
+        }
+    }
+
+    @Override
+    public void interruptThread() {
+        // only interrupt if the app is running AsyncTasks
+        if (mThread != null) mThread.interrupt();
+    }
+
+
 }

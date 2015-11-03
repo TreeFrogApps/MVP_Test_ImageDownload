@@ -1,16 +1,19 @@
 package com.treefrogapps.mvp_test_imagedownload.view;
 
-import android.support.v4.app.FragmentManager;
-import android.graphics.Bitmap;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.treefrogapps.mvp_test_imagedownload.MVP;
@@ -30,8 +33,8 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
 
     private Toolbar mToolbar;
     private EditText urlEditText;
-    private Button goButton;
-    private Button addButton;
+    private FloatingActionButton goButton, addButton;
+    private TextView downloadCountTV;
 
     private RecyclerView recyclerView;
     private ArrayList<RecyclerBitmap> recyclerBitmaps;
@@ -47,11 +50,11 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        if (mToolbar !=null) mToolbar.showOverflowMenu();
+        if (mToolbar != null) mToolbar.showOverflowMenu();
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         mRetainedFragment = (RetainedFragment) fragmentManager.findFragmentByTag(RetainedFragment.REATAINED_FRAGMENT_TAG);
-        if(mRetainedFragment == null){
+        if (mRetainedFragment == null) {
             mRetainedFragment = new RetainedFragment();
             fragmentManager.beginTransaction().add(mRetainedFragment, RetainedFragment.REATAINED_FRAGMENT_TAG).commit();
         }
@@ -71,14 +74,24 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     private void initialiseUI() {
 
         urlEditText = (EditText) findViewById(R.id.urlEditText);
-        addButton = (Button) findViewById(R.id.addButton);
+        downloadCountTV = (TextView) findViewById(R.id.downloadCountTextView);
+        downloadCountTV.setText(String.valueOf(mImagePresenter.getDownloadCount()));
+        addButton = (FloatingActionButton) findViewById(R.id.addFAB);
         addButton.setOnClickListener(this);
-        goButton = (Button) findViewById(R.id.goButton);
+        goButton = (FloatingActionButton) findViewById(R.id.downloadFAB);
         goButton.setOnClickListener(this);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(),
-                2,GridLayoutManager.HORIZONTAL, false));
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(),
+                    2, GridLayoutManager.HORIZONTAL, false));
+
+        } else {
+            recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(),
+                    2, GridLayoutManager.VERTICAL, false));
+        }
+
         recyclerBitmaps = mImagePresenter.recyclerBitmaps();
         imageRecyclerAdapter = new ImageRecyclerAdapter(this, recyclerBitmaps);
         recyclerView.setAdapter(imageRecyclerAdapter);
@@ -93,16 +106,24 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.deleteImages:
+
+                mImagePresenter.deleteImages();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void showToast(String toastMessage) {
         Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void displayImage(Bitmap bitmap) {
-
-    }
 
     @Override
     public void updateRecyclerView() {
@@ -114,8 +135,18 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
                 imageRecyclerAdapter.notifyDataSetChanged();
             }
         });
+    }
 
+    @Override
+    public void updateDownloadCount() {
 
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                downloadCountTV.setText(String.valueOf(mImagePresenter.getDownloadCount()));
+
+            }
+        });
     }
 
     @Override
@@ -123,15 +154,18 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
 
         switch (v.getId()) {
 
-            case R.id.goButton:
+            case R.id.downloadFAB:
+                Log.i("Button Pressed", "Download");
                 mImagePresenter.handleDownloads(mViewContext);
+                break;
 
-            case R.id.addButton :
+            case R.id.addFAB:
                 String url = urlEditText.getText().toString();
-
+                Log.i("Button Pressed", "Add");
                 if (!url.equals("")) {
                     mImagePresenter.handleButtonClick(url);
                 }
+                break;
         }
     }
 
@@ -142,5 +176,9 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         // handle config changes by placing presenter into retained fragment
         mRetainedFragment.putObject(ImagePresenter.PRESENTER_KEY, mImagePresenter);
         mRetainedFragment.putObject(ViewContext.VIEW_CONTEXT_KEY, mViewContext);
+
+        if (isFinishing()) {
+            mImagePresenter.interruptThread();
+        }
     }
 }

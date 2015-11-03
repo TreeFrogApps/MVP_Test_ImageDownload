@@ -19,22 +19,29 @@ public class ImageModel implements MVP.ModelInterface {
     private static final int MAX_POOL_SIZE = 256;
     private static final int KEEP_ALIVE_TIME = 1000;
 
+    private ArrayList<ImageDownloadAsyncTask> mImageDownloadAsyncTasks;
+
     @Override
     public void downloadBitmaps(ViewContext viewContext, MVP.DownloadFinishedObserver downloadFinishedObserver,
                                 ArrayList<String> urls, CountDownLatch countDownLatch) {
 
-        if (urls.size() > 0) {
+        mImageDownloadAsyncTasks = new ArrayList<>();
 
-            ImageDownloadAsyncTask imageDownloadTask;
+        if (urls.size() > 0) {
 
             ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
                     CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS,
                     new LinkedBlockingDeque<Runnable>(MAX_POOL_SIZE));
 
-            for (String url : urls) {
-                imageDownloadTask = new ImageDownloadAsyncTask(viewContext, downloadFinishedObserver, countDownLatch);
-                imageDownloadTask.executeOnExecutor(threadPoolExecutor, url);
+            for (int i = 0; i < urls.size(); i++) {
+                mImageDownloadAsyncTasks.add(i, new ImageDownloadAsyncTask(i, viewContext, downloadFinishedObserver, countDownLatch));
+                mImageDownloadAsyncTasks.get(i).executeOnExecutor(threadPoolExecutor, urls.get(i));
             }
         }
+    }
+
+    @Override
+    public ArrayList<ImageDownloadAsyncTask> getImageAsyncTasks() {
+        return mImageDownloadAsyncTasks;
     }
 }

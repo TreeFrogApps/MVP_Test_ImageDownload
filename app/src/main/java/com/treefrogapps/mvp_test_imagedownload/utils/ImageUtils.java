@@ -22,7 +22,7 @@ import java.util.Locale;
  */
 public class ImageUtils {
 
-    public static boolean isValidImage(InputStream inputStream){
+    public static boolean isValidImage(InputStream inputStream) {
 
         byte[] header = new byte[11];
 
@@ -47,25 +47,25 @@ public class ImageUtils {
         headerValues[9] = header[9] & 0xFF;
         headerValues[10] = header[10] & 0xFF;
 
-        if (headerValues[0] == 0xFF && headerValues[1] == 0xD8 && headerValues[2] == 0xFF){
+        if (headerValues[0] == 0xFF && headerValues[1] == 0xD8 && headerValues[2] == 0xFF) {
             // image is a jpg (can be various types of jpg - denoted from 4th byte
             Log.i("Image Type Valid", "jpg");
             return true;
 
         } else if (headerValues[0] == 0x89 && headerValues[1] == 0x50 && headerValues[2] == 0x4E && headerValues[3] == 0x47
-                && headerValues[4] == 0x0D && headerValues[5] == 0x0A && headerValues[6] == 0x1A && headerValues[7] == 0xA0){
+                && headerValues[4] == 0x0D && headerValues[5] == 0x0A && headerValues[6] == 0x1A && headerValues[7] == 0xA0) {
             // image is a PNG file
             Log.i("Image Type Valid", "png");
             return true;
 
-        } else if (headerValues[0] == 0x47 && headerValues[1] == 0x49 && headerValues[2] == 0x46 && headerValues[3] == 0x38){
+        } else if (headerValues[0] == 0x47 && headerValues[1] == 0x49 && headerValues[2] == 0x46 && headerValues[3] == 0x38) {
             // images is a GIF file
             Log.i("Image Type Valid", "gif");
             return true;
 
         } else if ((headerValues[0] == 0x49 || headerValues[0] == 0x4D) &&
                 (headerValues[1] == 0x49 || headerValues[1] == 0x20 || headerValues[0] == 0x4D) &&
-                (headerValues[2] == 0x49 || headerValues[2] == 0x2A || headerValues[2] == 0x00)){
+                (headerValues[2] == 0x49 || headerValues[2] == 0x2A || headerValues[2] == 0x00)) {
             // 99% sure this will be a TIF file
             Log.i("Image Type Valid", "tif");
             return true;
@@ -81,7 +81,7 @@ public class ImageUtils {
         }
     }
 
-    public static Bitmap scaleFilteredBitmap(InputStream inputStream){
+    public static Bitmap scaleFilteredBitmap(InputStream inputStream) {
 
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
 
@@ -97,22 +97,22 @@ public class ImageUtils {
         int width = scaledFilteredBitmap.getWidth();
         int height = scaledFilteredBitmap.getHeight();
 
-        for (int i = 0; i < width; i++){
+        for (int i = 0; i < width; i++) {
 
-            for (int j = 0; j < height; j++){
+            for (int j = 0; j < height; j++) {
 
-                int p = scaledFilteredBitmap.getPixel(i,j);
+                int p = scaledFilteredBitmap.getPixel(i, j);
                 int r = Color.red(p);
                 int g = Color.green(p);
                 int b = Color.blue(p);
                 int a = Color.alpha(p);
 
-                r =0;
-                g =0;
-                b+=100;
+                r = 0;
+                g = 0;
+                b += 100;
 
 
-                scaledFilteredBitmap.setPixel(i,j, Color.argb(a, r, g, b));
+                scaledFilteredBitmap.setPixel(i, j, Color.argb(a, r, g, b));
             }
         }
 
@@ -124,7 +124,7 @@ public class ImageUtils {
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
-            scaledFilteredBitmap.compress(Bitmap.CompressFormat.JPEG,100, fileOutputStream);
+            scaledFilteredBitmap.compress(Bitmap.CompressFormat.JPEG, 70, fileOutputStream);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

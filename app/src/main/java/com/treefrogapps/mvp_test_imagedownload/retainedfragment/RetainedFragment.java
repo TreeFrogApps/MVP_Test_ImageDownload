@@ -19,13 +19,12 @@ public class RetainedFragment extends Fragment {
     }
 
 
-
-    public void putObject(String key, Object object){
+    public void putObject(String key, Object object) {
 
         mObject.put(key, object);
     }
 
-    public Object getObject(String key){
+    public Object getObject(String key) {
 
         return mObject.get(key);
     }

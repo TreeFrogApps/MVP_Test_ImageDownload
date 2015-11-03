@@ -1,9 +1,12 @@
 <resources>
     <string name="app_name">MVP_Test_ImageDownload</string>
     <string name="menu_item_settings">Settings</string>
-    <string name="edit_text_enter_url_hint">http://climate.nasa.gov/system/feature_items/images/9_images_of_change.jpg</string>
+    <string name="edit_text_enter_url_hint">enter url and press plus to add</string>
     <string name="button_go">go</string>
     <string name="add_button">Add</string>
     <string name="downloaded_image">Downloaded Image</string>
+    <string name="menu_delete_images">Delete Images</string>
+    <string name="menu_delete_title">delete</string>
+    <string name="textview_download">Image Download Count</string>
 
 </resources>

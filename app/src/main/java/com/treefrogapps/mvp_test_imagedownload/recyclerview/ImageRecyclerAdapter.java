@@ -18,7 +18,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
     private Context mContext;
     private ArrayList<RecyclerBitmap> mRecyclerBitmaps;
 
-    public ImageRecyclerAdapter(Context context, ArrayList<RecyclerBitmap> recyclerBitmaps){
+    public ImageRecyclerAdapter(Context context, ArrayList<RecyclerBitmap> recyclerBitmaps) {
 
         this.mContext = context;
         this.mRecyclerBitmaps = recyclerBitmaps;

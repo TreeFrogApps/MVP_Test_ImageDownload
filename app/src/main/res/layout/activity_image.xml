@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/toolbar"/>
+    <include layout="@layout/toolbar" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,35 +21,58 @@
             android:layout_width="match_parent"
             android:inputType="textUri"
             android:layout_height="wrap_content"
-            android:hint="@string/edit_text_enter_url_hint"/>
+            android:hint="@string/edit_text_enter_url_hint" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/downloadCountTextView"
+            android:text=""
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryDark"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="right">
-
-            <Button
-                android:id="@+id/addButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add_button"/>
-
-            <Button
-                android:id="@+id/goButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/button_go"/>
-
-        </LinearLayout>
+            android:gravity="center" />
 
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_margin="4dp"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_margin="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="16dp"
+            android:layout_marginRight="16dp"
+            android:orientation="vertical">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/addFAB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="16dp"
+                app:fabSize="mini"
+                android:src="@mipmap/ic_fab_plus_item" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/downloadFAB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:backgroundTint="@color/colorPrimaryDark"
+                android:src="@android:drawable/stat_sys_download" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 
 </LinearLayout>
