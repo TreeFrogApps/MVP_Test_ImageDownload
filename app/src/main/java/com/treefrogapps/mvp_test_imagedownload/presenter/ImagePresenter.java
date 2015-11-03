@@ -20,11 +20,11 @@ import java.util.concurrent.CountDownLatch;
 public class ImagePresenter implements MVP.PresenterInterface, MVP.DownloadFinishedObserver {
 
     public static final String PRESENTER_KEY = "com.treefrogapps.mvp_test_imagedownload.presenter.key";
+    public static final String FOLDER_LOCATION = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/Assignment_Images";
 
     private WeakReference<MVP.ViewInterface> mViewInterface;
     private ImageModel mImageModel;
     private MVP.DownloadFinishedObserver mDownloadFinishedObserver;
-    private String mFolderLocation;
     private File mFileFolder;
     private ArrayList<String> mImagesToDownload;
     private ArrayList<RecyclerBitmap> mRecyclerBitmaps;
@@ -46,8 +46,8 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.DownloadFinis
         // link / relink the viewInterface
         this.mViewInterface = new WeakReference<>(viewInterface);
 
-        mFolderLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/Assignment_Images";
-        mFileFolder = new File(mFolderLocation);
+
+        mFileFolder = new File(FOLDER_LOCATION);
         if (!mFileFolder.exists()) {
             mFileFolder.mkdirs();
             Log.i("Folder", "Created");
@@ -81,9 +81,17 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.DownloadFinis
     @Override
     public void deleteImages() {
 
-        // TODO
-
+        File[] fileArray = mFileFolder.listFiles();
+        if(fileArray != null) {
+            if (fileArray.length > 0) {
+                for (File file : fileArray) {
+                    file.delete();
+                }
+            }
+        }
+        mRecyclerBitmaps.clear();
         mViewInterface.get().updateRecyclerView();
+
     }
 
     @Override
@@ -100,6 +108,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.DownloadFinis
             @Override
             public void run() {
                 try {
+
                     mCountDownLatch.await();
                 } catch (InterruptedException e) {
                     Log.d("AsyncTask Interrupt", "Shutting down AsyncTasks");
@@ -110,12 +119,14 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.DownloadFinis
                     if (mViewInterface.get() != null) {
                         mViewInterface.get().updateRecyclerView();
                         mViewInterface.get().updateDownloadCount();
+                        mViewInterface.get().stopProgressDialog();
                     }
                 }
             }
         });
 
         mThread.start();
+        mViewInterface.get().startProgressDialog();
         mImageModel.downloadBitmaps(viewContext, this, mImagesToDownload, mCountDownLatch);
     }
 

@@ -8,5 +8,6 @@
     <string name="menu_delete_images">Delete Images</string>
     <string name="menu_delete_title">delete</string>
     <string name="textview_download">Image Download Count</string>
+    <string name="progress_title">Downloading Images</string>
 
 </resources>

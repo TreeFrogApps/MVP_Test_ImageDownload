@@ -3,8 +3,9 @@ package com.treefrogapps.mvp_test_imagedownload.utils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.Environment;
 import android.util.Log;
+
+import com.treefrogapps.mvp_test_imagedownload.presenter.ImagePresenter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -116,11 +117,10 @@ public class ImageUtils {
             }
         }
 
-        String folderLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/Assignment_Images";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh_mm_ss_SSS", Locale.getDefault());
         String filename = sdf.format(new Date());
 
-        File imageFile = new File(folderLocation, "Image_downloaded_" + filename + ".jpg");
+        File imageFile = new File(ImagePresenter.FOLDER_LOCATION, "Image_downloaded_" + filename + ".jpg");
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(imageFile);

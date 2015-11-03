@@ -20,6 +20,7 @@ import java.util.concurrent.CountDownLatch;
 public interface MVP {
 
     interface PresenterInterface {
+
         void handleButtonClick(String url);
 
         void handleDownloads(ViewContext viewContext);
@@ -38,14 +39,20 @@ public interface MVP {
     }
 
     interface ViewInterface {
+
         void showToast(String toastMessage);
 
         void updateRecyclerView();
 
         void updateDownloadCount();
+
+        void startProgressDialog();
+
+        void stopProgressDialog();
     }
 
     interface ModelInterface {
+
         void downloadBitmaps(ViewContext viewContext, DownloadFinishedObserver downloadFinishedObserver,
                              ArrayList<String> urls, CountDownLatch countDownLatch);
 
@@ -54,6 +61,7 @@ public interface MVP {
     }
 
     interface DownloadFinishedObserver {
+
         void downloadedImage(Bitmap bitmap);
     }
 }

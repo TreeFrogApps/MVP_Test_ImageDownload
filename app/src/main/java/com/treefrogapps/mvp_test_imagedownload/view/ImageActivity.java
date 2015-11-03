@@ -1,5 +1,6 @@
 package com.treefrogapps.mvp_test_imagedownload.view;
 
+import android.app.ProgressDialog;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +37,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     private EditText urlEditText;
     private FloatingActionButton goButton, addButton;
     private TextView downloadCountTV;
+    private ProgressDialog progressDialog;
 
     private RecyclerView recyclerView;
     private ArrayList<RecyclerBitmap> recyclerBitmaps;
@@ -95,7 +98,6 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         recyclerBitmaps = mImagePresenter.recyclerBitmaps();
         imageRecyclerAdapter = new ImageRecyclerAdapter(this, recyclerBitmaps);
         recyclerView.setAdapter(imageRecyclerAdapter);
-
     }
 
 
@@ -145,6 +147,28 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
             public void run() {
                 downloadCountTV.setText(String.valueOf(mImagePresenter.getDownloadCount()));
 
+            }
+        });
+    }
+
+    @Override
+    public void startProgressDialog() {
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+        progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        progressDialog.show();
+        progressDialog.setContentView(R.layout.progress_dialog);
+
+    }
+
+    @Override
+    public void stopProgressDialog() {
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.dismiss();
             }
         });
     }
