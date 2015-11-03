@@ -152,28 +152,6 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     }
 
     @Override
-    public void startProgressDialog() {
-
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setCancelable(false);
-        progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        progressDialog.show();
-        progressDialog.setContentView(R.layout.progress_dialog);
-
-    }
-
-    @Override
-    public void stopProgressDialog() {
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progressDialog.dismiss();
-            }
-        });
-    }
-
-    @Override
     public void onClick(View v) {
 
         switch (v.getId()) {

@@ -46,9 +46,6 @@ public interface MVP {
 
         void updateDownloadCount();
 
-        void startProgressDialog();
-
-        void stopProgressDialog();
     }
 
     interface ModelInterface {
