@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class RetainedFragment extends Fragment {
 
-    public static final String REATAINED_FRAGMENT_TAG = "com.treefrogapps.mvp_test_imagedownload.retainedfragment.tag";
+    public static final String RETAINED_FRAGMENT_TAG = "com.treefrogapps.mvp_test_imagedownload.retainedfragment.tag";
     private HashMap<String, Object> mObject = new HashMap<String, Object>();
 
     @Override
@@ -15,7 +15,6 @@ public class RetainedFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         setRetainInstance(true);
-
     }
 
 

@@ -1,47 +1,59 @@
 package com.treefrogapps.mvp_test_imagedownload.model;
 
 
+import android.graphics.Bitmap;
+
 import com.treefrogapps.mvp_test_imagedownload.MVP;
-import com.treefrogapps.mvp_test_imagedownload.async.ImageDownloadAsyncTask;
+import com.treefrogapps.mvp_test_imagedownload.async.ImageAsyncTask;
+import com.treefrogapps.mvp_test_imagedownload.utils.ImageThreadPool;
+import com.treefrogapps.mvp_test_imagedownload.utils.ImageUtils;
 import com.treefrogapps.mvp_test_imagedownload.utils.ViewContext;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class ImageModel implements MVP.ModelInterface {
 
     public static final String MODEL_KEY = "com.treefrogapps.mvp_test_imagedownload.model.key";
 
-    private static final int CORE_POOL_SIZE = 20;
-    private static final int MAX_POOL_SIZE = 256;
-    private static final int KEEP_ALIVE_TIME = 1000;
+    public static int DOWNLOAD_AND_PROCESS_IMAGES = 1;
+    public static int PROCESS_IMAGES = 2;
 
-    private ArrayList<ImageDownloadAsyncTask> mImageDownloadAsyncTasks;
+
+    private ArrayList<ImageAsyncTask> mImageAsyncTasks;
 
     @Override
-    public void downloadBitmaps(ViewContext viewContext, MVP.DownloadFinishedObserver downloadFinishedObserver,
-                                ArrayList<String> urls, CountDownLatch countDownLatch) {
+    public void processBitmaps(int asyncType, ViewContext viewContext, MVP.AsyncFinishedObserver asyncFinishedObserver,
+                               ArrayList<String> fileLocation, CountDownLatch countDownLatch) {
 
-        mImageDownloadAsyncTasks = new ArrayList<>();
+        mImageAsyncTasks = new ArrayList<>();
 
-        if (urls.size() > 0) {
+        if (fileLocation.size() > 0) {
 
-            ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
-                    CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS,
-                    new LinkedBlockingDeque<Runnable>(MAX_POOL_SIZE));
+            if (asyncType == DOWNLOAD_AND_PROCESS_IMAGES)
+                viewContext.getmView().get().showToast("Downloading Images");
 
-            for (int i = 0; i < urls.size(); i++) {
-                mImageDownloadAsyncTasks.add(i, new ImageDownloadAsyncTask(i, viewContext, downloadFinishedObserver, countDownLatch));
-                mImageDownloadAsyncTasks.get(i).executeOnExecutor(threadPoolExecutor, urls.get(i));
+            if (asyncType == PROCESS_IMAGES)
+                viewContext.getmView().get().showToast("Loading Images");
+
+            for (int i = 0; i < fileLocation.size(); i++) {
+                mImageAsyncTasks.add(i, new ImageAsyncTask(asyncType, i, viewContext, asyncFinishedObserver, countDownLatch));
+                mImageAsyncTasks.get(i).executeOnExecutor(ImageThreadPool.IMAGE_THREAD_POOL_EXECUTOR, fileLocation.get(i));
             }
         }
     }
 
     @Override
-    public ArrayList<ImageDownloadAsyncTask> getImageAsyncTasks() {
-        return mImageDownloadAsyncTasks;
+    public ArrayList<ImageAsyncTask> getImageAsyncTasks() {
+        return mImageAsyncTasks;
+    }
+
+    @Override
+    public Bitmap imageLoader(File imageFile) {
+
+        // TODO - return using asynctask
+
+        return ImageUtils.imageLoader(imageFile);
     }
 }

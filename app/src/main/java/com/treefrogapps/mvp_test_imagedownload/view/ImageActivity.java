@@ -1,7 +1,5 @@
 package com.treefrogapps.mvp_test_imagedownload.view;
 
-import android.app.ProgressDialog;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
@@ -13,7 +11,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,7 +34,6 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     private EditText urlEditText;
     private FloatingActionButton goButton, addButton;
     private TextView downloadCountTV;
-    private ProgressDialog progressDialog;
 
     private RecyclerView recyclerView;
     private ArrayList<RecyclerBitmap> recyclerBitmaps;
@@ -56,10 +52,10 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         if (mToolbar != null) mToolbar.showOverflowMenu();
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        mRetainedFragment = (RetainedFragment) fragmentManager.findFragmentByTag(RetainedFragment.REATAINED_FRAGMENT_TAG);
+        mRetainedFragment = (RetainedFragment) fragmentManager.findFragmentByTag(RetainedFragment.RETAINED_FRAGMENT_TAG);
         if (mRetainedFragment == null) {
             mRetainedFragment = new RetainedFragment();
-            fragmentManager.beginTransaction().add(mRetainedFragment, RetainedFragment.REATAINED_FRAGMENT_TAG).commit();
+            fragmentManager.beginTransaction().add(mRetainedFragment, RetainedFragment.RETAINED_FRAGMENT_TAG).commit();
         }
 
         // handle config change by getting the instance of the presenter
@@ -67,9 +63,12 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         mViewContext = (ViewContext) mRetainedFragment.getObject(ViewContext.VIEW_CONTEXT_KEY);
         //if null first time in
         if (mImagePresenter == null) mImagePresenter = new ImagePresenter();
-        if (mViewContext == null) mViewContext = new ViewContext(this);
+        if (mViewContext == null) {
+            Log.e("View Context", "NULL");
+            mViewContext = new ViewContext(this);
+        }
 
-        mImagePresenter.onCreate(this);
+        mImagePresenter.onCreate(mViewContext);
         initialiseUI();
 
     }
@@ -85,15 +84,8 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         goButton.setOnClickListener(this);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(),
-                    2, GridLayoutManager.HORIZONTAL, false));
-
-        } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(),
-                    2, GridLayoutManager.VERTICAL, false));
-        }
+        recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(),
+                2, GridLayoutManager.VERTICAL, false));
 
         recyclerBitmaps = mImagePresenter.recyclerBitmaps();
         imageRecyclerAdapter = new ImageRecyclerAdapter(this, recyclerBitmaps);
@@ -122,8 +114,13 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     }
 
     @Override
-    public void showToast(String toastMessage) {
-        Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT).show();
+    public void showToast(final String toastMessage) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
@@ -163,9 +160,10 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
 
             case R.id.addFAB:
                 String url = urlEditText.getText().toString();
-                Log.i("Button Pressed", "Add");
                 if (!url.equals("")) {
+                    Log.i("Button Pressed", "Add");
                     mImagePresenter.handleButtonClick(url);
+                    urlEditText.setText("");
                 }
                 break;
         }

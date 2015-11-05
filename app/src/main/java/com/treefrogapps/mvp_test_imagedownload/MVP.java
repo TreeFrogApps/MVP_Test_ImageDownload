@@ -2,10 +2,11 @@ package com.treefrogapps.mvp_test_imagedownload;
 
 import android.graphics.Bitmap;
 
-import com.treefrogapps.mvp_test_imagedownload.async.ImageDownloadAsyncTask;
+import com.treefrogapps.mvp_test_imagedownload.async.ImageAsyncTask;
 import com.treefrogapps.mvp_test_imagedownload.recyclerview.RecyclerBitmap;
 import com.treefrogapps.mvp_test_imagedownload.utils.ViewContext;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
@@ -25,7 +26,7 @@ public interface MVP {
 
         void handleDownloads(ViewContext viewContext);
 
-        void onCreate(MVP.ViewInterface viewInterface);
+        void onCreate(ViewContext viewContext);
 
         ArrayList<RecyclerBitmap> recyclerBitmaps();
 
@@ -40,7 +41,7 @@ public interface MVP {
 
     interface ViewInterface {
 
-        void showToast(String toastMessage);
+        void showToast(final String toastMessage);
 
         void updateRecyclerView();
 
@@ -50,15 +51,17 @@ public interface MVP {
 
     interface ModelInterface {
 
-        void downloadBitmaps(ViewContext viewContext, DownloadFinishedObserver downloadFinishedObserver,
-                             ArrayList<String> urls, CountDownLatch countDownLatch);
+        void processBitmaps(int asyncType, ViewContext viewContext, AsyncFinishedObserver asyncFinishedObserver,
+                            ArrayList<String> fileLocation, CountDownLatch countDownLatch);
 
-        ArrayList<ImageDownloadAsyncTask> getImageAsyncTasks();
+        ArrayList<ImageAsyncTask> getImageAsyncTasks();
+
+        Bitmap imageLoader(File imageFile);
 
     }
 
-    interface DownloadFinishedObserver {
+    interface AsyncFinishedObserver {
 
-        void downloadedImage(Bitmap bitmap);
+        void processedImage(Bitmap bitmap);
     }
 }

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">MVP_Test_ImageDownload</string>
     <string name="menu_item_settings">Settings</string>
-    <string name="edit_text_enter_url_hint">enter url and press plus to add</string>
+    <string name="edit_text_enter_url_hint">Enter url and press plus to add</string>
     <string name="button_go">go</string>
     <string name="add_button">Add</string>
     <string name="downloaded_image">Downloaded Image</string>
@@ -9,5 +9,6 @@
     <string name="menu_delete_title">delete</string>
     <string name="textview_download">Image Download Count</string>
     <string name="progress_title">Downloading Images</string>
+    <string name="pending_downloads">Pending Downloads</string>
 
 </resources>
