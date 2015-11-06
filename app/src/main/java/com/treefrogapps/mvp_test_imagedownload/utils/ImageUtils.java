@@ -135,9 +135,7 @@ public class ImageUtils {
         int scaleFactor = 1;
         int maxPixelCount = 120000;
 
-        while ((imageWidth * imageHeight) > maxPixelCount) {
-            imageWidth /= 2;
-            imageHeight /= 2;
+        while ((imageWidth * imageHeight) * (1 / Math.pow(scaleFactor, 2)) > maxPixelCount) {
             scaleFactor++;
         }
 
@@ -157,8 +155,32 @@ public class ImageUtils {
         } else {
             return startUrl + url;
         }
+    }
+
+    public static String saveBitmap(InputStream inputStream){
+
+        Bitmap downloadedBitmap = BitmapFactory.decodeStream(inputStream);
+
+        try {
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh_mm_ss_SSS", Locale.getDefault());
+        String filename = sdf.format(new Date());
+
+        File imageFile = new File(ImagePresenter.FOLDER_LOCATION, "Image_downloaded_" + filename + ".jpg");
+
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
+            downloadedBitmap.compress(Bitmap.CompressFormat.JPEG, 70, fileOutputStream);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
 
+        return imageFile.getAbsolutePath();
     }
 
     public static Bitmap imageLoader(File imageFile) {

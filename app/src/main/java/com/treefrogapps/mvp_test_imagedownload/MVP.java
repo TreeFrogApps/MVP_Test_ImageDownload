@@ -63,5 +63,7 @@ public interface MVP {
     interface AsyncFinishedObserver {
 
         void processedImage(Bitmap bitmap);
+
+        void downloadedImage(String fileLocation);
     }
 }

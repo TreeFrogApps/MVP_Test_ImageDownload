@@ -164,6 +164,11 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
     }
 
     @Override
+    public void downloadedImage(String fileLocation) {
+
+    }
+
+    @Override
     public void shutdownAsyncTasks() {
 
         // get current ImageAsyncTasks

@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -47,6 +47,11 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
 
+        /**
+         * Initialise the Field Variables
+         * Get an Instance of the retained fragment to hold reference to the Presenter layer
+         */
+
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         if (mToolbar != null) mToolbar.showOverflowMenu();
@@ -60,15 +65,14 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
 
         // handle config change by getting the instance of the presenter
         mImagePresenter = (ImagePresenter) mRetainedFragment.getObject(ImagePresenter.PRESENTER_KEY);
-        mViewContext = (ViewContext) mRetainedFragment.getObject(ViewContext.VIEW_CONTEXT_KEY);
-        //if null first time in
-        if (mImagePresenter == null) mImagePresenter = new ImagePresenter();
-        if (mViewContext == null) {
-            Log.e("View Context", "NULL");
-            mViewContext = new ViewContext(this);
-        }
 
+        // if null first time in
+        if (mImagePresenter == null) mImagePresenter = new ImagePresenter();
+
+        // initialise the view layer to the presenter layer
+        mViewContext = new ViewContext(this);
         mImagePresenter.onCreate(mViewContext);
+
         initialiseUI();
 
     }
@@ -84,8 +88,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         goButton.setOnClickListener(this);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(),
-                2, GridLayoutManager.VERTICAL, false));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         recyclerBitmaps = mImagePresenter.recyclerBitmaps();
         imageRecyclerAdapter = new ImageRecyclerAdapter(this, recyclerBitmaps);
@@ -106,7 +109,6 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         switch (item.getItemId()) {
 
             case R.id.deleteImages:
-
                 mImagePresenter.deleteImages();
         }
 
@@ -175,7 +177,6 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
 
         // handle config changes by placing presenter into retained fragment
         mRetainedFragment.putObject(ImagePresenter.PRESENTER_KEY, mImagePresenter);
-        mRetainedFragment.putObject(ViewContext.VIEW_CONTEXT_KEY, mViewContext);
 
         if (isFinishing()) {
             mImagePresenter.interruptThread();
