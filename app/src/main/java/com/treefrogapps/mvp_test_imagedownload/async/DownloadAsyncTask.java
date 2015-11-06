@@ -91,5 +91,7 @@ public class DownloadAsyncTask extends AsyncTask<String, Void, String> {
     protected void onCancelled() {
         super.onCancelled();
 
+        mAsyncFinishedObserver.asyncCancelled("Downloading " + String.valueOf(mIndex) + " canceled");
+
     }
 }

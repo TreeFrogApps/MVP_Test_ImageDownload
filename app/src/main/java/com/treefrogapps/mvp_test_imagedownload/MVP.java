@@ -67,5 +67,7 @@ public interface MVP {
 
         void processedImage(Bitmap bitmap);
 
+        void asyncCancelled(String message);
+
     }
 }

@@ -15,14 +15,13 @@ import java.util.concurrent.CountDownLatch;
  */
 public class ImageAsyncTask extends AsyncTask<String, Void, Bitmap> {
 
-    private WeakReference<MVP.ViewInterface> viewContext;
-    private WeakReference<MVP.AsyncFinishedObserver> downloadFinishedObserver;
+    private WeakReference<MVP.AsyncFinishedObserver>  mAsyncFinishedObserver;
     private CountDownLatch mCountDownLatch;
     private int mIndex;
 
     public ImageAsyncTask(int index, MVP.AsyncFinishedObserver asyncFinishedObserver,
                           CountDownLatch countDownLatch) {
-        this.downloadFinishedObserver = new WeakReference<>(asyncFinishedObserver);
+        this. mAsyncFinishedObserver = new WeakReference<>(asyncFinishedObserver);
         this.mCountDownLatch = countDownLatch;
         this.mIndex = index;
 
@@ -43,7 +42,7 @@ public class ImageAsyncTask extends AsyncTask<String, Void, Bitmap> {
         super.onPostExecute(bitmap);
 
         if (bitmap != null) {
-            downloadFinishedObserver.get().processedImage(bitmap);
+            mAsyncFinishedObserver.get().processedImage(bitmap);
         }
 
         mCountDownLatch.countDown();
@@ -52,9 +51,7 @@ public class ImageAsyncTask extends AsyncTask<String, Void, Bitmap> {
     @Override
     protected void onCancelled() {
         super.onCancelled();
-
-        if (viewContext.get() != null)
-            viewContext.get().showToast("Processing " + String.valueOf(mIndex) + " cancelled");
+        mAsyncFinishedObserver.get().asyncCancelled("Processing Image " + String.valueOf(mIndex) + " canceled");
         mCountDownLatch.countDown();
     }
 }

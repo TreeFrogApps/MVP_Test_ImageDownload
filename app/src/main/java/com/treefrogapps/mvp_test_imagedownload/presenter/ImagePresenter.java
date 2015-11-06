@@ -83,7 +83,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
                     });
 
                     mThread.start();
-                    mImageModel.downloadBitmaps(viewContext, this, mDownloadedImages, mCountDownLatch);
+                    mImageModel.processBitmaps(viewContext, this, mDownloadedImages, mCountDownLatch);
                 }
             }
         }
@@ -140,6 +140,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
                     mDownloadCount = 0;
                     mImagesToGet.clear();
                     if (mViewInterface.getmView().get() != null) {
+                        mViewInterface.getmView().get().updateRecyclerView();
                         mViewInterface.getmView().get().updateDownloadCount();
                         mViewInterface.getmView().get().showToast("Downloads Complete");
                     }
@@ -161,6 +162,11 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
 
     }
 
+    @Override
+    public void asyncCancelled(String message) {
+
+        mViewInterface.getmView().get().showToast(message);
+    }
 
     @Override
     public void shutdownAsyncTasks() {
@@ -170,12 +176,18 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
         ArrayList<ImageAsyncTask> imageAsyncTasks = mImageModel.getImageAsyncTasks();
 
         synchronized (this) {
+
             // set each to cancel
-            for (DownloadAsyncTask task : downloadAsyncTasks) {
-                task.cancel(true);
+            if (downloadAsyncTasks != null) {
+                for (DownloadAsyncTask task : downloadAsyncTasks) {
+                    task.cancel(true);
+                }
             }
-            for (ImageAsyncTask task : imageAsyncTasks) {
-                task.cancel(true);
+
+            if (imageAsyncTasks != null) {
+                for (ImageAsyncTask task : imageAsyncTasks) {
+                    task.cancel(true);
+                }
             }
         }
     }
