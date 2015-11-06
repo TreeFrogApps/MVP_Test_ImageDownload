@@ -157,7 +157,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
 
             case R.id.downloadFAB:
                 Log.i("Button Pressed", "Download");
-                mImagePresenter.handleDownloads(mViewContext);
+                mImagePresenter.handleDownloads();
                 break;
 
             case R.id.addFAB:

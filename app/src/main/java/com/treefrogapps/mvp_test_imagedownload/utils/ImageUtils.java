@@ -81,16 +81,29 @@ public class ImageUtils {
         }
     }
 
-    public static Bitmap scaleFilteredBitmap(InputStream inputStream) {
+    public static Bitmap scaleFilteredBitmap(String fileLocation) {
 
-        Bitmap downloadedBitmap = BitmapFactory.decodeStream(inputStream);
-        Bitmap filteredBitmap = downloadedBitmap.copy(downloadedBitmap.getConfig(), true);
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        bmOptions.inJustDecodeBounds = true;
 
-        try {
-            inputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        BitmapFactory.decodeFile(fileLocation, bmOptions);
+
+        int imageWidth = bmOptions.outWidth;
+        int imageHeight = bmOptions.outHeight;
+
+        int scaleFactor = 1;
+        int maxPixelCount = 120000;
+
+        while ((imageWidth * imageHeight) * (1 / Math.pow(scaleFactor, 2)) > maxPixelCount) {
+            scaleFactor++;
         }
+
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inJustDecodeBounds = false;
+
+        Bitmap downloadedBitmap = BitmapFactory.decodeFile(fileLocation, bmOptions);
+        Bitmap filteredBitmap = downloadedBitmap.copy(downloadedBitmap.getConfig(), true);
 
         downloadedBitmap.recycle();
 
@@ -112,37 +125,7 @@ public class ImageUtils {
             }
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh_mm_ss_SSS", Locale.getDefault());
-        String filename = sdf.format(new Date());
-
-        File imageFile = new File(ImagePresenter.FOLDER_LOCATION, "Image_downloaded_" + filename + ".jpg");
-
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
-            filteredBitmap.compress(Bitmap.CompressFormat.JPEG, 70, fileOutputStream);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        bmOptions.inJustDecodeBounds = true;
-
-        BitmapFactory.decodeFile(imageFile.getAbsolutePath(), bmOptions);
-        int imageWidth = bmOptions.outWidth;
-        int imageHeight = bmOptions.outHeight;
-
-        int scaleFactor = 1;
-        int maxPixelCount = 120000;
-
-        while ((imageWidth * imageHeight) * (1 / Math.pow(scaleFactor, 2)) > maxPixelCount) {
-            scaleFactor++;
-        }
-
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inJustDecodeBounds = false;
-
-        return BitmapFactory.decodeFile(imageFile.getAbsolutePath(), bmOptions);
+        return filteredBitmap;
     }
 
     public static String checkURL(String url) {
@@ -182,31 +165,4 @@ public class ImageUtils {
 
         return imageFile.getAbsolutePath();
     }
-
-    public static Bitmap imageLoader(File imageFile) {
-
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-
-        BitmapFactory.decodeFile(imageFile.getAbsolutePath(), bmOptions);
-        int imageWidth = bmOptions.outWidth;
-        int imageHeight = bmOptions.outHeight;
-
-        int scaleFactor = 1;
-        int maxPixelCount = 120000;
-
-        while ((imageWidth * imageHeight) > maxPixelCount) {
-            imageWidth /= 2;
-            imageHeight /= 2;
-            scaleFactor++;
-        }
-
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
-
-        return BitmapFactory.decodeFile(imageFile.getAbsolutePath(), bmOptions);
-    }
-
-
 }

@@ -2,11 +2,11 @@ package com.treefrogapps.mvp_test_imagedownload;
 
 import android.graphics.Bitmap;
 
+import com.treefrogapps.mvp_test_imagedownload.async.DownloadAsyncTask;
 import com.treefrogapps.mvp_test_imagedownload.async.ImageAsyncTask;
 import com.treefrogapps.mvp_test_imagedownload.recyclerview.RecyclerBitmap;
 import com.treefrogapps.mvp_test_imagedownload.utils.ViewContext;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
@@ -24,7 +24,7 @@ public interface MVP {
 
         void handleButtonClick(String url);
 
-        void handleDownloads(ViewContext viewContext);
+        void handleDownloads();
 
         void onCreate(ViewContext viewContext);
 
@@ -51,12 +51,15 @@ public interface MVP {
 
     interface ModelInterface {
 
-        void processBitmaps(int asyncType, ViewContext viewContext, AsyncFinishedObserver asyncFinishedObserver,
+        void downloadBitmaps(ViewContext viewContext, AsyncFinishedObserver asyncFinishedObserver,
                             ArrayList<String> fileLocation, CountDownLatch countDownLatch);
 
-        ArrayList<ImageAsyncTask> getImageAsyncTasks();
+        void processBitmaps(ViewContext viewContext, AsyncFinishedObserver asyncFinishedObserver,
+                             ArrayList<String> fileLocation, CountDownLatch countDownLatch);
 
-        Bitmap imageLoader(File imageFile);
+        ArrayList<DownloadAsyncTask> getDownloadAsyncTasks();
+
+        ArrayList<ImageAsyncTask> getImageAsyncTasks();
 
     }
 
@@ -64,6 +67,5 @@ public interface MVP {
 
         void processedImage(Bitmap bitmap);
 
-        void downloadedImage(String fileLocation);
     }
 }

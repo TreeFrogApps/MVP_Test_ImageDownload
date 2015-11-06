@@ -4,12 +4,11 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.treefrogapps.mvp_test_imagedownload.MVP;
+import com.treefrogapps.mvp_test_imagedownload.utils.ImageThreadPool;
 import com.treefrogapps.mvp_test_imagedownload.utils.ImageUtils;
-import com.treefrogapps.mvp_test_imagedownload.utils.ViewContext;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,17 +20,16 @@ import java.util.concurrent.CountDownLatch;
 public class DownloadAsyncTask extends AsyncTask<String, Void, String> {
 
     private String fileLocation;
-    private WeakReference<MVP.ViewInterface> viewContext;
-    private WeakReference<MVP.AsyncFinishedObserver> downloadFinishedObserver;
+    private MVP.AsyncFinishedObserver mAsyncFinishedObserver;
     private CountDownLatch mCountDownLatch;
     private int mIndex;
 
-    public DownloadAsyncTask(int index, ViewContext viewContext, MVP.AsyncFinishedObserver asyncFinishedObserver,
+    public DownloadAsyncTask(int index, MVP.AsyncFinishedObserver asyncFinishedObserver,
                              CountDownLatch countDownLatch) {
-        this.viewContext = viewContext.getmView();
-        this.downloadFinishedObserver = new WeakReference<>(asyncFinishedObserver);
+
         this.mCountDownLatch = countDownLatch;
         this.mIndex = index;
+        this.mAsyncFinishedObserver = asyncFinishedObserver;
     }
 
     @Override
@@ -84,18 +82,14 @@ public class DownloadAsyncTask extends AsyncTask<String, Void, String> {
         super.onPostExecute(fileLocation);
 
         if (fileLocation != null) {
-            downloadFinishedObserver.get().downloadedImage(fileLocation);
+            ImageAsyncTask imageAsyncTask = new ImageAsyncTask(mIndex, mAsyncFinishedObserver, mCountDownLatch);
+            imageAsyncTask.executeOnExecutor(ImageThreadPool.IMAGE_THREAD_POOL_EXECUTOR, fileLocation);
         }
-
-        mCountDownLatch.countDown();
     }
 
     @Override
     protected void onCancelled() {
         super.onCancelled();
 
-        if (viewContext.get() != null)
-            viewContext.get().showToast("Processing " + String.valueOf(mIndex) + " cancelled");
-        mCountDownLatch.countDown();
     }
 }

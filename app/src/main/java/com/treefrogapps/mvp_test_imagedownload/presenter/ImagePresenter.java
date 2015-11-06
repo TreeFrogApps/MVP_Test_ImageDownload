@@ -6,6 +6,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.treefrogapps.mvp_test_imagedownload.MVP;
+import com.treefrogapps.mvp_test_imagedownload.async.DownloadAsyncTask;
 import com.treefrogapps.mvp_test_imagedownload.async.ImageAsyncTask;
 import com.treefrogapps.mvp_test_imagedownload.model.ImageModel;
 import com.treefrogapps.mvp_test_imagedownload.recyclerview.RecyclerBitmap;
@@ -27,6 +28,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
     private File mFileFolder;
     private ArrayList<String> mImagesToGet;
     private ArrayList<RecyclerBitmap> mRecyclerBitmaps;
+    private ArrayList<String> mDownloadedImages;
     private CountDownLatch mCountDownLatch;
     private Thread mThread;
     private int mDownloadCount = 0;
@@ -37,6 +39,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
         this.mAsyncFinishedObserver = this;
         this.mImagesToGet = new ArrayList<>();
         this.mRecyclerBitmaps = new ArrayList<>();
+        this.mDownloadedImages = new ArrayList<>();
     }
 
     @Override
@@ -57,10 +60,10 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
                 if (fileArray.length > 0) {
                     for (File file : fileArray) {
 
-                        mImagesToGet.add(file.getAbsolutePath());
+                        mDownloadedImages.add(file.getAbsolutePath());
                     }
 
-                    mCountDownLatch = new CountDownLatch(mImagesToGet.size());
+                    mCountDownLatch = new CountDownLatch(mDownloadedImages.size());
 
                     mThread = new Thread(new Runnable() {
                         @Override
@@ -71,7 +74,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
                                 Log.d("AsyncTask Interrupt", "Shutting down AsyncTasks");
                                 shutdownAsyncTasks();
                             } finally {
-                                mImagesToGet.clear();
+                                mDownloadedImages.clear();
                                 if (mViewInterface.getmView().get() != null) {
                                     mViewInterface.getmView().get().updateRecyclerView();
                                 }
@@ -80,8 +83,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
                     });
 
                     mThread.start();
-                    mImageModel.processBitmaps(ImageModel.PROCESS_IMAGES,
-                            viewContext, this, mImagesToGet, mCountDownLatch);
+                    mImageModel.downloadBitmaps(viewContext, this, mDownloadedImages, mCountDownLatch);
                 }
             }
         }
@@ -122,7 +124,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
     }
 
     @Override
-    public void handleDownloads(ViewContext viewContext) {
+    public void handleDownloads() {
 
         mCountDownLatch = new CountDownLatch(mImagesToGet.size());
 
@@ -130,7 +132,6 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
             @Override
             public void run() {
                 try {
-
                     mCountDownLatch.await();
                 } catch (InterruptedException e) {
                     Log.d("AsyncTask Interrupt", "Shutting down AsyncTasks");
@@ -139,9 +140,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
                     mDownloadCount = 0;
                     mImagesToGet.clear();
                     if (mViewInterface.getmView().get() != null) {
-                        mViewInterface.getmView().get().updateRecyclerView();
                         mViewInterface.getmView().get().updateDownloadCount();
-
                         mViewInterface.getmView().get().showToast("Downloads Complete");
                     }
                 }
@@ -149,8 +148,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
         });
 
         mThread.start();
-        mImageModel.processBitmaps(ImageModel.DOWNLOAD_AND_PROCESS_IMAGES,
-                viewContext, this, mImagesToGet, mCountDownLatch);
+        mImageModel.downloadBitmaps(mViewInterface, this, mImagesToGet, mCountDownLatch);
     }
 
     @Override
@@ -163,19 +161,19 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
 
     }
 
-    @Override
-    public void downloadedImage(String fileLocation) {
-
-    }
 
     @Override
     public void shutdownAsyncTasks() {
 
         // get current ImageAsyncTasks
+        ArrayList<DownloadAsyncTask> downloadAsyncTasks = mImageModel.getDownloadAsyncTasks();
         ArrayList<ImageAsyncTask> imageAsyncTasks = mImageModel.getImageAsyncTasks();
 
         synchronized (this) {
             // set each to cancel
+            for (DownloadAsyncTask task : downloadAsyncTasks) {
+                task.cancel(true);
+            }
             for (ImageAsyncTask task : imageAsyncTasks) {
                 task.cancel(true);
             }
