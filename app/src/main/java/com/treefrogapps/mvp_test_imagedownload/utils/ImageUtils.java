@@ -93,7 +93,7 @@ public class ImageUtils {
         int imageHeight = bmOptions.outHeight;
 
         int scaleFactor = 1;
-        int maxPixelCount = 120000;
+        int maxPixelCount = 320000;
 
         while ((imageWidth * imageHeight) * (1 / Math.pow(scaleFactor, 2)) > maxPixelCount) {
             scaleFactor++;

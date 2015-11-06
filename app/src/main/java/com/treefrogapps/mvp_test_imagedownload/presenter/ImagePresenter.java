@@ -157,7 +157,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
 
         synchronized (this) {
             RecyclerBitmap recyclerBitmap = new RecyclerBitmap(bitmap);
-            mRecyclerBitmaps.add(recyclerBitmap);
+            mRecyclerBitmaps.add(0, recyclerBitmap);
         }
 
     }

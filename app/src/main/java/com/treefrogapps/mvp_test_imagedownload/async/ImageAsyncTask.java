@@ -11,7 +11,7 @@ import java.lang.ref.WeakReference;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Custom Asynctask to handle download of image
+ * Custom Async task to handle processing of image
  */
 public class ImageAsyncTask extends AsyncTask<String, Void, Bitmap> {
 
