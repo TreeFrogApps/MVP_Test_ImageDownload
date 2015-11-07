@@ -12,6 +12,7 @@ import com.treefrogapps.mvp_test_imagedownload.async.ImageAsyncTask;
 import com.treefrogapps.mvp_test_imagedownload.model.ImageModel;
 import com.treefrogapps.mvp_test_imagedownload.recyclerview.ImageRecyclerAdapter;
 import com.treefrogapps.mvp_test_imagedownload.recyclerview.RecyclerBitmap;
+import com.treefrogapps.mvp_test_imagedownload.utils.ConnectionStatus;
 import com.treefrogapps.mvp_test_imagedownload.utils.ImageUtils;
 import com.treefrogapps.mvp_test_imagedownload.utils.ViewContext;
 import com.treefrogapps.mvp_test_imagedownload.view.ImageViewActivity;
@@ -154,6 +155,11 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
 
         intent.putExtra(ImageRecyclerAdapter.IMAGE_FILE_LOCATION, fileLocation);
         context.startActivity(intent);
+    }
+
+    @Override
+    public boolean connectionStatus(Context context) {
+        return ConnectionStatus.isConnected(context);
     }
 
     @Override

@@ -41,6 +41,8 @@ public interface MVP {
         int getImageCount();
 
         void handleRecyclerButtonClick(Context context, String fileLocation);
+
+        boolean connectionStatus(Context context);
     }
 
     interface ViewInterface {
