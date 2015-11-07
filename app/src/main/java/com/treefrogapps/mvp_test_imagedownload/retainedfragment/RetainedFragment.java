@@ -7,6 +7,11 @@ import java.util.HashMap;
 
 public class RetainedFragment extends Fragment {
 
+    /**
+     * Retained fragment is used to hold the ImagePresenter Reference when the Launcher Activity
+     * is destroyed and re-created on a configuration change like rotation.
+     */
+
     public static final String RETAINED_FRAGMENT_TAG = "com.treefrogapps.mvp_test_imagedownload.retainedfragment.tag";
     private HashMap<String, Object> mObject = new HashMap<String, Object>();
 

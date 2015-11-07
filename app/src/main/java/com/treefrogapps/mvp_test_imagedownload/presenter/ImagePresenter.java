@@ -1,7 +1,8 @@
 package com.treefrogapps.mvp_test_imagedownload.presenter;
 
 
-import android.graphics.Bitmap;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Environment;
 import android.util.Log;
 
@@ -9,15 +10,25 @@ import com.treefrogapps.mvp_test_imagedownload.MVP;
 import com.treefrogapps.mvp_test_imagedownload.async.DownloadAsyncTask;
 import com.treefrogapps.mvp_test_imagedownload.async.ImageAsyncTask;
 import com.treefrogapps.mvp_test_imagedownload.model.ImageModel;
+import com.treefrogapps.mvp_test_imagedownload.recyclerview.ImageRecyclerAdapter;
 import com.treefrogapps.mvp_test_imagedownload.recyclerview.RecyclerBitmap;
 import com.treefrogapps.mvp_test_imagedownload.utils.ImageUtils;
 import com.treefrogapps.mvp_test_imagedownload.utils.ViewContext;
+import com.treefrogapps.mvp_test_imagedownload.view.ImageViewActivity;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
 public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinishedObserver {
+
+    /**
+     * Presenter Layer to handle all the logic of updating the UI and getting data from the Model layer
+     *
+     * Implements 2 interfaces, one from the MVP pattern, and another from the Observer pattern
+     * When Async tasks have completed they callback to the presenter directly either to update the
+     * UI with a toast, or a RecyclerBitmap object
+     */
 
     public static final String PRESENTER_KEY = "com.treefrogapps.mvp_test_imagedownload.presenter.key";
     public static final String FOLDER_LOCATION = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/Assignment_Images";
@@ -96,9 +107,17 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
 
     @Override
     public void handleButtonClick(String url) {
-        mImagesToGet.add(ImageUtils.checkURL(url));
-        mDownloadCount++;
-        mViewInterface.getmView().get().updateDownloadCount();
+
+        String urlToAdd = ImageUtils.checkURL(url);
+
+        if (!urlToAdd.equals("")) {
+            mImagesToGet.add(urlToAdd);
+            mDownloadCount++;
+            mViewInterface.getmView().get().updateDownloadCount();
+        } else {
+            mViewInterface.getmView().get().showToast("Not a valid image url");
+        }
+
     }
 
     @Override
@@ -121,6 +140,20 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
     @Override
     public int getDownloadCount() {
         return mDownloadCount;
+    }
+
+    @Override
+    public int getImageCount() {
+        return mRecyclerBitmaps.size();
+    }
+
+    @Override
+    public void handleRecyclerButtonClick(Context context, String fileLocation) {
+
+        Intent intent = new Intent(context, ImageViewActivity.class);
+
+        intent.putExtra(ImageRecyclerAdapter.IMAGE_FILE_LOCATION, fileLocation);
+        context.startActivity(intent);
     }
 
     @Override
@@ -153,10 +186,9 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
     }
 
     @Override
-    public void processedImage(Bitmap bitmap) {
+    public void processedImage(RecyclerBitmap recyclerBitmap) {
 
         synchronized (this) {
-            RecyclerBitmap recyclerBitmap = new RecyclerBitmap(bitmap);
             mRecyclerBitmaps.add(0, recyclerBitmap);
         }
 

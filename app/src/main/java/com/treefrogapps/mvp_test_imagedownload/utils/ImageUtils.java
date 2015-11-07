@@ -23,6 +23,13 @@ import java.util.Locale;
  */
 public class ImageUtils {
 
+    /**
+     *
+     * @param inputStream
+     * inputstream from DownLoadAsyncTask
+     * @return
+     * returns true or false depending if a valid image format
+     */
     public static boolean isValidImage(InputStream inputStream) {
 
         byte[] header = new byte[11];
@@ -133,14 +140,26 @@ public class ImageUtils {
         String startUrl = "http://";
         String startUrlSecure = "https://";
 
-        if (startUrl.equals(url.substring(0, 7)) || startUrlSecure.equals(url.substring(0, 8))) {
-            return url;
+        String fileType = url.substring(url.length() - 4, url.length());
+        String jpg = ".jpg";
+        String gif = ".gif";
+        String tif = ".tif";
+        String bmp = ".bmp";
+        String png = ".png";
+
+        if (fileType.equals(jpg) || fileType.equals(gif) || fileType.equals(tif) || fileType.equals(bmp) || fileType.equals(png)) {
+            if (((startUrl.equals(url.substring(0, 7)) || startUrlSecure.equals(url.substring(0, 8))))) {
+                return url;
+            } else {
+                return startUrl + url;
+            }
         } else {
-            return startUrl + url;
+            return "";
         }
+
     }
 
-    public static String saveBitmap(InputStream inputStream){
+    public static String saveBitmap(InputStream inputStream) {
 
         Bitmap downloadedBitmap = BitmapFactory.decodeStream(inputStream);
 

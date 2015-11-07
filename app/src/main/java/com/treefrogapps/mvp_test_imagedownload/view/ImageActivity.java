@@ -33,7 +33,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     private Toolbar mToolbar;
     private EditText urlEditText;
     private FloatingActionButton goButton, addButton;
-    private TextView downloadCountTV;
+    private TextView downloadCountTV, imageCountTV;
 
     private RecyclerView recyclerView;
     private ArrayList<RecyclerBitmap> recyclerBitmaps;
@@ -82,6 +82,8 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         urlEditText = (EditText) findViewById(R.id.urlEditText);
         downloadCountTV = (TextView) findViewById(R.id.downloadCountTextView);
         downloadCountTV.setText(String.valueOf(mImagePresenter.getDownloadCount()));
+        imageCountTV = (TextView) findViewById(R.id.imageCountTextView);
+        imageCountTV.setText(String.valueOf(mImagePresenter.getImageCount()));
         addButton = (FloatingActionButton) findViewById(R.id.addFAB);
         addButton.setOnClickListener(this);
         goButton = (FloatingActionButton) findViewById(R.id.downloadFAB);
@@ -91,7 +93,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         recyclerBitmaps = mImagePresenter.recyclerBitmaps();
-        imageRecyclerAdapter = new ImageRecyclerAdapter(this, recyclerBitmaps);
+        imageRecyclerAdapter = new ImageRecyclerAdapter(this, recyclerBitmaps, mImagePresenter);
         recyclerView.setAdapter(imageRecyclerAdapter);
     }
 
@@ -134,6 +136,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
             public void run() {
                 recyclerBitmaps = mImagePresenter.recyclerBitmaps();
                 imageRecyclerAdapter.notifyDataSetChanged();
+                imageCountTV.setText(String.valueOf(mImagePresenter.getImageCount()));
             }
         });
     }
@@ -162,7 +165,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
 
             case R.id.addFAB:
                 String url = urlEditText.getText().toString();
-                if (!url.equals("")) {
+                if (!url.equals("") && url.length() > 9) {
                     Log.i("Button Pressed", "Add");
                     mImagePresenter.handleButtonClick(url);
                     urlEditText.setText("");

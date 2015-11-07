@@ -12,6 +12,11 @@ import java.util.concurrent.CountDownLatch;
 
 public class ImageModel implements MVP.ModelInterface {
 
+    /**
+     * Model Class that handles interaction with AsyncTasks
+     *
+     */
+
     public static final String MODEL_KEY = "com.treefrogapps.mvp_test_imagedownload.model.key";
 
 
