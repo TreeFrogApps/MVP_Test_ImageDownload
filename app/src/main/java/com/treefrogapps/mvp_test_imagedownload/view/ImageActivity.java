@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -92,7 +92,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         goButton.setOnClickListener(this);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false));
 
         recyclerBitmaps = mImagePresenter.recyclerBitmaps();
         imageRecyclerAdapter = new ImageRecyclerAdapter(this, recyclerBitmaps, mImagePresenter);
