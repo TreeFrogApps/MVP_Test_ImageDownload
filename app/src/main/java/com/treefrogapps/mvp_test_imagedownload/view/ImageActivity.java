@@ -42,6 +42,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     private ImagePresenter mImagePresenter;
     private ViewContext mViewContext;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,6 +104,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
     }
 
@@ -112,7 +114,14 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         switch (item.getItemId()) {
 
             case R.id.deleteImages:
-                mImagePresenter.deleteImages();
+
+                /**
+                 * Only delete images if processing or downloading of images is not in operation
+                 */
+
+                if(!mImagePresenter.isDownloading() && mImagePresenter.getImageCount() > 0){
+                    mImagePresenter.deleteImages();
+                }
         }
 
         return super.onOptionsItemSelected(item);
@@ -178,6 +187,9 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        // let the presenter know that this is a configuration change like rotation
+        mImagePresenter.setConfigChange(true);
 
         // handle config changes by placing presenter into retained fragment
         mRetainedFragment.putObject(ImagePresenter.PRESENTER_KEY, mImagePresenter);

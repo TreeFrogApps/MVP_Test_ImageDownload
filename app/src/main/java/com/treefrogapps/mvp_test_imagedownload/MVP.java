@@ -43,6 +43,10 @@ public interface MVP {
         void handleRecyclerButtonClick(Context context, String fileLocation);
 
         boolean connectionStatus(Context context);
+
+        void setConfigChange(boolean isConfigChange);
+
+        boolean isDownloading();
     }
 
     interface ViewInterface {

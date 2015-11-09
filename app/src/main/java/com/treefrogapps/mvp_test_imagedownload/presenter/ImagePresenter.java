@@ -25,7 +25,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
 
     /**
      * Presenter Layer to handle all the logic of updating the UI and getting data from the Model layer
-     *
+     * <p/>
      * Implements 2 interfaces, one from the MVP pattern, and another from the Observer pattern
      * When Async tasks have completed they callback to the presenter directly either to update the
      * UI with a toast, or a RecyclerBitmap object
@@ -33,6 +33,12 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
 
     public static final String PRESENTER_KEY = "com.treefrogapps.mvp_test_imagedownload.presenter.key";
     public static final String FOLDER_LOCATION = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/Assignment_Images";
+
+    /**
+     * boolean value set to true whilst a download / processing operation is occurring
+     * disables delete functionality temporarily
+     */
+    private volatile boolean isDownloading = false;
 
     private ViewContext mViewInterface;
     private ImageModel mImageModel;
@@ -44,6 +50,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
     private CountDownLatch mCountDownLatch;
     private Thread mThread;
     private int mDownloadCount = 0;
+    private volatile boolean isConfigChange = false;
 
     public ImagePresenter() {
 
@@ -65,40 +72,15 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
             Log.i("Folder", "Created");
         }
 
-        if (mRecyclerBitmaps.size() == 0) {
+        if (mRecyclerBitmaps.size() == 0 && !isConfigChange) {
 
             final File[] fileArray = mFileFolder.listFiles();
             if (fileArray != null) {
                 if (fileArray.length > 0) {
 
-                    /**
-                     * Create a new thread that adds to a ArrayList of strings
-                     * for current images in the Assignment_Images folder
-                     * Make the calling thread (Main thread/UI Thread) wait for the
-                     * thread before continuing using .join() method
-                     *
-                     * A new thread is required otherwise on configuration change
-                     * in UI Thread would start re-listing files and adding more than once
-                     * this thread continues on config changes in the main thread.
-                     */
+                    for (File file : fileArray) {
 
-                    Thread fileLoadThread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            for (File file : fileArray) {
-
-                                mDownloadedImages.add(file.getAbsolutePath());
-                            }
-                        }
-                    });
-
-                    fileLoadThread.start();
-
-                    try {
-                        fileLoadThread.join();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        mDownloadedImages.add(file.getAbsolutePath());
                     }
 
                     mCountDownLatch = new CountDownLatch(mDownloadedImages.size());
@@ -107,6 +89,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
                         @Override
                         public void run() {
                             try {
+                                isDownloading = true;
                                 mCountDownLatch.await();
                             } catch (InterruptedException e) {
                                 Log.d("AsyncTask Interrupt", "Shutting down AsyncTasks");
@@ -116,6 +99,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
                                 if (mViewInterface.getmView().get() != null) {
                                     mViewInterface.getmView().get().updateRecyclerView();
                                 }
+                                isDownloading = false;
                             }
                         }
                     });
@@ -189,6 +173,16 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
     }
 
     @Override
+    public void setConfigChange(boolean isConfigChange) {
+        this.isConfigChange = isConfigChange;
+    }
+
+    @Override
+    public boolean isDownloading() {
+        return this.isDownloading;
+    }
+
+    @Override
     public void handleDownloads() {
 
         mCountDownLatch = new CountDownLatch(mImagesToGet.size());
@@ -197,6 +191,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
             @Override
             public void run() {
                 try {
+                    isDownloading = true;
                     mCountDownLatch.await();
                 } catch (InterruptedException e) {
                     Log.d("AsyncTask Interrupt", "Shutting down AsyncTasks");
@@ -209,6 +204,8 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
                         mViewInterface.getmView().get().updateDownloadCount();
                         mViewInterface.getmView().get().showToast("Downloads Complete");
                     }
+
+                    isDownloading = false;
                 }
             }
         });
