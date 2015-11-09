@@ -46,7 +46,7 @@ public interface MVP {
 
         void setConfigChange(boolean isConfigChange);
 
-        boolean isDownloading();
+        boolean isProcessing();
     }
 
     interface ViewInterface {

@@ -1,6 +1,5 @@
 package com.treefrogapps.mvp_test_imagedownload.view;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
@@ -18,8 +17,6 @@ public class ImageViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_view);
-
-        Bitmap bitmap = null;
 
         String imageLocation = getIntent().getStringExtra(ImageRecyclerAdapter.IMAGE_FILE_LOCATION);
 

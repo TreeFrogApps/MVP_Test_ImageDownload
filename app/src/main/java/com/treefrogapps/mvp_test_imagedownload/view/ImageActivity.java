@@ -119,7 +119,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
                  * Only delete images if processing or downloading of images is not in operation
                  */
 
-                if(!mImagePresenter.isDownloading() && mImagePresenter.getImageCount() > 0){
+                if(!mImagePresenter.isProcessing() && mImagePresenter.getImageCount() > 0){
                     mImagePresenter.deleteImages();
                 }
         }

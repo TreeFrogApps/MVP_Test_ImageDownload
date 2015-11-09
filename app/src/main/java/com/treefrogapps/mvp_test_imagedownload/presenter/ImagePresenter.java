@@ -38,7 +38,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
      * boolean value set to true whilst a download / processing operation is occurring
      * disables delete functionality temporarily
      */
-    private volatile boolean isDownloading = false;
+    private volatile boolean isProcessing = false;
 
     private ViewContext mViewInterface;
     private ImageModel mImageModel;
@@ -89,7 +89,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
                         @Override
                         public void run() {
                             try {
-                                isDownloading = true;
+                                isProcessing = true;
                                 mCountDownLatch.await();
                             } catch (InterruptedException e) {
                                 Log.d("AsyncTask Interrupt", "Shutting down AsyncTasks");
@@ -99,7 +99,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
                                 if (mViewInterface.getmView().get() != null) {
                                     mViewInterface.getmView().get().updateRecyclerView();
                                 }
-                                isDownloading = false;
+                                isProcessing = false;
                             }
                         }
                     });
@@ -178,8 +178,8 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
     }
 
     @Override
-    public boolean isDownloading() {
-        return this.isDownloading;
+    public boolean isProcessing() {
+        return this.isProcessing;
     }
 
     @Override
@@ -191,7 +191,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
             @Override
             public void run() {
                 try {
-                    isDownloading = true;
+                    isProcessing = true;
                     mCountDownLatch.await();
                 } catch (InterruptedException e) {
                     Log.d("AsyncTask Interrupt", "Shutting down AsyncTasks");
@@ -205,7 +205,7 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
                         mViewInterface.getmView().get().showToast("Downloads Complete");
                     }
 
-                    isDownloading = false;
+                    isProcessing = false;
                 }
             }
         });
