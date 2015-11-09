@@ -81,7 +81,6 @@ public class DownloadAsyncTask extends AsyncTask<String, Void, String> {
             }
         }
 
-
         return fileLocation;
     }
 

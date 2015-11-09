@@ -67,12 +67,38 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
 
         if (mRecyclerBitmaps.size() == 0) {
 
-            File[] fileArray = mFileFolder.listFiles();
+            final File[] fileArray = mFileFolder.listFiles();
             if (fileArray != null) {
                 if (fileArray.length > 0) {
-                    for (File file : fileArray) {
 
-                        mDownloadedImages.add(file.getAbsolutePath());
+                    /**
+                     * Create a new thread that adds to a ArrayList of strings
+                     * for current images in the Assignment_Images folder
+                     * Make the calling thread (Main thread/UI Thread) wait for the
+                     * thread before continuing using .join() method
+                     *
+                     * A new thread is required otherwise on configuration change
+                     * in UI Thread would start re-listing files and adding more than once
+                     * this thread continues on config changes in the main thread.
+                     */
+
+                    Thread fileLoadThread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            for (File file : fileArray) {
+
+                                mDownloadedImages.add(file.getAbsolutePath());
+                            }
+                        }
+                    });
+
+                    fileLoadThread.start();
+
+                    try {
+                        fileLoadThread.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
 
                     mCountDownLatch = new CountDownLatch(mDownloadedImages.size());

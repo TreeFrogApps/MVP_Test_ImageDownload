@@ -71,6 +71,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
 
         // initialise the view layer to the presenter layer
         mViewContext = new ViewContext(this);
+
         mImagePresenter.onCreate(mViewContext);
 
         initialiseUI();

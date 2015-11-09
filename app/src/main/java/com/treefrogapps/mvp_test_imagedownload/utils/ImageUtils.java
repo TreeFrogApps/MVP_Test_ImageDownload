@@ -91,7 +91,7 @@ public class ImageUtils {
     public static Bitmap scaleFilteredBitmap(String fileLocation) {
 
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        bmOptions.inPreferredConfig = Bitmap.Config.RGB_565;;
         bmOptions.inJustDecodeBounds = true;
 
         BitmapFactory.decodeFile(fileLocation, bmOptions);
@@ -183,5 +183,39 @@ public class ImageUtils {
 
 
         return imageFile.getAbsolutePath();
+    }
+
+    public static Bitmap openOriginalImage(String imageLocation){
+
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inPreferredConfig = Bitmap.Config.RGB_565;;
+        bmOptions.inJustDecodeBounds = true;
+
+        BitmapFactory.decodeFile(imageLocation, bmOptions);
+
+        int imageWidth = bmOptions.outWidth;
+        int imageHeight = bmOptions.outHeight;
+
+        int scaleFactor = 1;
+
+        int requiredWidth = 2048;
+        int requiredHeight = 2048;
+
+        // scale bitmap if over max display size
+        if (imageWidth > requiredWidth || imageHeight > requiredHeight){
+
+            final int halfWidth = imageWidth / 2;
+            final int halfHeight = imageHeight / 2;
+
+            while (halfWidth / scaleFactor > requiredWidth
+                    || halfHeight / scaleFactor > requiredHeight){
+                scaleFactor *=2;
+            }
+        }
+
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inJustDecodeBounds = false;
+
+        return BitmapFactory.decodeFile(imageLocation, bmOptions);
     }
 }

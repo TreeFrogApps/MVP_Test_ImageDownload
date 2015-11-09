@@ -1,13 +1,13 @@
 package com.treefrogapps.mvp_test_imagedownload.view;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
 import com.treefrogapps.mvp_test_imagedownload.R;
 import com.treefrogapps.mvp_test_imagedownload.recyclerview.ImageRecyclerAdapter;
+import com.treefrogapps.mvp_test_imagedownload.utils.ImageUtils;
 
 
 public class ImageViewActivity extends AppCompatActivity {
@@ -25,11 +25,11 @@ public class ImageViewActivity extends AppCompatActivity {
 
         if (imageLocation != null) {
 
-            bitmap = BitmapFactory.decodeFile(imageLocation);
+            imageView = (ImageView) findViewById(R.id.my_image_view);
+            imageView.setImageBitmap(ImageUtils.openOriginalImage(imageLocation));
         }
 
-        imageView = (ImageView) findViewById(R.id.my_image_view);
-        imageView.setImageBitmap(bitmap);
+
 
 
     }
