@@ -80,7 +80,12 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
 
                     for (File file : fileArray) {
 
-                        mDownloadedImages.add(file.getAbsolutePath());
+                        if (file.length() > 0) {
+
+                            mDownloadedImages.add(file.getAbsolutePath());
+                        } else {
+                            file.delete();
+                        }
                     }
 
                     mCountDownLatch = new CountDownLatch(mDownloadedImages.size());
