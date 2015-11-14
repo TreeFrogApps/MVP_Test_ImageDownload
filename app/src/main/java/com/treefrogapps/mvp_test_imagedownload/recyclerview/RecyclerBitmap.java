@@ -9,7 +9,7 @@ public class RecyclerBitmap {
     private String mFileLocation;
 
     /**
-     * RecyclerBitmap class to hole the file path and processed bitmap
+     * RecyclerBitmap class to hold the file path and processed bitmap
      * used in the RecyclerView Adapter
      *
      * @param fileLocation String to the file path of the image

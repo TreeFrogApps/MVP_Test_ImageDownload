@@ -1,7 +1,10 @@
 package com.treefrogapps.mvp_test_imagedownload.view;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -28,6 +31,11 @@ import java.util.ArrayList;
 
 public class ImageActivity extends AppCompatActivity implements MVP.ViewInterface, View.OnClickListener {
 
+    // Permissions at runtime - sdk23 >
+    public static boolean READ_PERMISSION;
+    public static boolean WRITE_PERMISSION;
+    private static int PERMISSION_REQUEST_CODE = 10;
+
     private RetainedFragment mRetainedFragment;
 
     private Toolbar mToolbar;
@@ -48,14 +56,52 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
 
-        /**
-         * Initialise the Field Variables
-         * Get an Instance of the retained fragment to hold reference to the Presenter layer
-         */
-
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         if (mToolbar != null) mToolbar.showOverflowMenu();
+
+        /**
+         * Initialise the Field Variables
+         * Get an Instance of the retained fragment to hold reference to the Presenter layer
+         *
+         * For sdk23 and above first get 'dangerous' permissions - READ / WRITE
+         */
+
+        // Get Read/Write permissions - sdk23 > ------------------------------------------------------------
+        READ_PERMISSION = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
+
+        WRITE_PERMISSION = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
+
+        Log.i("PERMISSIONS", "READ " + String.valueOf(READ_PERMISSION) + ", WRITE " + String.valueOf(WRITE_PERMISSION));
+
+        if(!READ_PERMISSION || !WRITE_PERMISSION){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+        }
+
+        initialiseFragmentAndPresenter();
+        initialiseUI();
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == PERMISSION_REQUEST_CODE){
+
+            if (grantResults[0] != PackageManager.PERMISSION_GRANTED && grantResults[1] != PackageManager.PERMISSION_GRANTED){
+                showToast("Permissions not granted - app will not function correctly");
+            } else {
+                READ_PERMISSION = true;
+                WRITE_PERMISSION = true;
+            }
+        }
+    }
+
+    private void initialiseFragmentAndPresenter() {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         mRetainedFragment = (RetainedFragment) fragmentManager.findFragmentByTag(RetainedFragment.RETAINED_FRAGMENT_TAG);
@@ -74,9 +120,6 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
         mViewContext = new ViewContext(this);
 
         mImagePresenter.onCreate(mViewContext);
-
-        initialiseUI();
-
     }
 
     private void initialiseUI() {
@@ -170,7 +213,10 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
 
             case R.id.downloadFAB:
                 Log.i("Button Pressed", "Download");
-                if (mImagePresenter.connectionStatus(this)) mImagePresenter.handleDownloads();
+                if (mImagePresenter.connectionStatus(this) && READ_PERMISSION && WRITE_PERMISSION){
+                    mImagePresenter.handleDownloads();
+                }
+
                 break;
 
             case R.id.addFAB:

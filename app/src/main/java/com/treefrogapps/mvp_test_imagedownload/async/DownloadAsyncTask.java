@@ -62,6 +62,7 @@ public class DownloadAsyncTask extends AsyncTask<String, Void, String> {
                 httpURLConnection = (HttpURLConnection) imageUrl.openConnection();
                 InputStream inputStream1 = httpURLConnection.getInputStream();
 
+
                 fileLocation = ImageUtils.saveBitmap(inputStream1);
 
                 inputStream.close();
