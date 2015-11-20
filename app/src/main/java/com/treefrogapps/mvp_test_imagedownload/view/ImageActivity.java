@@ -2,7 +2,9 @@ package com.treefrogapps.mvp_test_imagedownload.view;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
@@ -64,30 +66,41 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
          * Initialise the Field Variables
          * Get an Instance of the retained fragment to hold reference to the Presenter layer
          *
-         * For sdk23 and above first get 'dangerous' permissions - READ / WRITE
          */
-
-        // Get Read/Write permissions - sdk23 > ------------------------------------------------------------
-        READ_PERMISSION = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED;
-
-        WRITE_PERMISSION = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED;
-
-        Log.i("PERMISSIONS", "READ " + String.valueOf(READ_PERMISSION) + ", WRITE " + String.valueOf(WRITE_PERMISSION));
-
-        if(!READ_PERMISSION || !WRITE_PERMISSION){
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
-        }
 
         initialiseFragmentAndPresenter();
         initialiseUI();
+
+
+    }
+
+    @Override
+    public void getPermissions() {
+
+        // Get Read/Write permissions - sdk23 > ------------------------------------------------------------
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+            READ_PERMISSION = true;
+            WRITE_PERMISSION = true;
+        } else {
+            READ_PERMISSION = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED;
+
+            WRITE_PERMISSION = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED;
+
+            Log.i("PERMISSIONS", "READ " + String.valueOf(READ_PERMISSION) + ", WRITE " + String.valueOf(WRITE_PERMISSION));
+
+            if(!READ_PERMISSION || !WRITE_PERMISSION){
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+            }
+        }
     }
 
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == PERMISSION_REQUEST_CODE){
@@ -97,6 +110,7 @@ public class ImageActivity extends AppCompatActivity implements MVP.ViewInterfac
             } else {
                 READ_PERMISSION = true;
                 WRITE_PERMISSION = true;
+                android.os.Process.killProcess(android.os.Process.myPid());
             }
         }
     }

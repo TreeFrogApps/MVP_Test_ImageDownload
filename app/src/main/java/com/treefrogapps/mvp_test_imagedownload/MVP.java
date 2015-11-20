@@ -57,6 +57,8 @@ public interface MVP {
 
         void updateDownloadCount();
 
+        void getPermissions();
+
     }
 
     interface ModelInterface {

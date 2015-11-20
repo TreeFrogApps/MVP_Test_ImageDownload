@@ -15,6 +15,7 @@ import com.treefrogapps.mvp_test_imagedownload.recyclerview.RecyclerBitmap;
 import com.treefrogapps.mvp_test_imagedownload.utils.ConnectionStatus;
 import com.treefrogapps.mvp_test_imagedownload.utils.ImageUtils;
 import com.treefrogapps.mvp_test_imagedownload.utils.ViewContext;
+import com.treefrogapps.mvp_test_imagedownload.view.ImageActivity;
 import com.treefrogapps.mvp_test_imagedownload.view.ImageViewActivity;
 
 import java.io.File;
@@ -66,54 +67,60 @@ public class ImagePresenter implements MVP.PresenterInterface, MVP.AsyncFinished
 
         this.mViewInterface = viewContext;
 
-        mFileFolder = new File(FOLDER_LOCATION);
-        if (!mFileFolder.exists()) {
-            mFileFolder.mkdirs();
-            Log.i("Folder", "Created");
-        }
+        viewContext.getmView().get().getPermissions();
 
-        if (mRecyclerBitmaps.size() == 0 && !isConfigChange) {
+        if (ImageActivity.WRITE_PERMISSION && ImageActivity.READ_PERMISSION){
 
-            final File[] fileArray = mFileFolder.listFiles();
-            if (fileArray != null) {
-                if (fileArray.length > 0) {
+            mFileFolder = new File(FOLDER_LOCATION);
+            if (!mFileFolder.exists()) {
+                mFileFolder.mkdirs();
+                Log.i("Folder", "Created");
+            }
 
-                    for (File file : fileArray) {
+            if (mRecyclerBitmaps.size() == 0 && !isConfigChange) {
 
-                        if (file.length() > 0) {
+                final File[] fileArray = mFileFolder.listFiles();
+                if (fileArray != null) {
+                    if (fileArray.length > 0) {
 
-                            mDownloadedImages.add(file.getAbsolutePath());
-                        } else {
-                            file.delete();
-                        }
-                    }
+                        for (File file : fileArray) {
 
-                    mCountDownLatch = new CountDownLatch(mDownloadedImages.size());
+                            if (file.length() > 0) {
 
-                    mThread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                isProcessing = true;
-                                mCountDownLatch.await();
-                            } catch (InterruptedException e) {
-                                Log.d("AsyncTask Interrupt", "Shutting down AsyncTasks");
-                                shutdownAsyncTasks();
-                            } finally {
-                                mDownloadedImages.clear();
-                                if (mViewInterface.getmView().get() != null) {
-                                    mViewInterface.getmView().get().updateRecyclerView();
-                                }
-                                isProcessing = false;
+                                mDownloadedImages.add(file.getAbsolutePath());
+                            } else {
+                                file.delete();
                             }
                         }
-                    });
 
-                    mThread.start();
-                    mImageModel.processBitmaps(viewContext, this, mDownloadedImages, mCountDownLatch);
+                        mCountDownLatch = new CountDownLatch(mDownloadedImages.size());
+
+                        mThread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    isProcessing = true;
+                                    mCountDownLatch.await();
+                                } catch (InterruptedException e) {
+                                    Log.d("AsyncTask Interrupt", "Shutting down AsyncTasks");
+                                    shutdownAsyncTasks();
+                                } finally {
+                                    mDownloadedImages.clear();
+                                    if (mViewInterface.getmView().get() != null) {
+                                        mViewInterface.getmView().get().updateRecyclerView();
+                                    }
+                                    isProcessing = false;
+                                }
+                            }
+                        });
+
+                        mThread.start();
+                        mImageModel.processBitmaps(viewContext, this, mDownloadedImages, mCountDownLatch);
+                    }
                 }
             }
         }
+
     }
 
     @Override
